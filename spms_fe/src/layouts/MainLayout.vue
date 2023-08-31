@@ -38,7 +38,7 @@
       :width="200"
       :breakpoint="500"
       bordered
-      :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
+      :class="$q.dark.isActive ? 'bg-white' : 'bg-white'"
     >
      <q-scroll-area class="fit" :horizontal-thumb-style="{ opacity: 0 }">
       <q-list padding>
@@ -58,13 +58,14 @@
         /> -->
 
           <q-item v-ripple>
-              <q-item-section avatar>
-                <q-icon>
-                  <q-img src="~assets/MSU_Gensan_logo.png" />
-                </q-icon>
+            <q-avatar square>
+              <img src="~assets/MSU_Gensan_logo.png">
+            </q-avatar>
+              <q-item-section style="margin-left: 5px;">
+                <strong>MSU-GENSAN</strong>
               </q-item-section>
             </q-item>
-           <q-item clickable v-ripple>
+           <q-item clickable v-ripple to="www.google.com">
               <q-item-section avatar>
                 <q-icon name="inbox" />
               </q-item-section>
