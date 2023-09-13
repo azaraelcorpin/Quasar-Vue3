@@ -26,5 +26,9 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
 
+  Router.beforeEach((to, from, next) => {
+    document.title = process.env.VUE_APP_NAME+'-'+to.meta.title;
+    next();
+  })
   return Router
 })
