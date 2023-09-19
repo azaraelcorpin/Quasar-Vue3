@@ -1,5 +1,6 @@
 <template>
-  <div style="color:white;display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; position: relative;" class="bg">
+  <!-- <div style="color:white;display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; position: relative;" class="bg"> -->
+    <div class="fullscreen bg text-white text-center q-pa-md flex flex-center">
     <div style=" align-items: center; justify-content: center;position: absolute; top: 20px; font-size: 48px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold; color: black;">
       Mindanao State University</div>
       <div  style="position: absolute;margin-bottom: 30%;  font-size: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold; color: black;">
@@ -29,14 +30,13 @@ export default{
           const callback = (response) => {
             // This callback will be triggered when the user selects or login to
             // his Google account from the popup
-            console.log("Handle the response", response)
             const userData = decodeCredential(response.credential)
-            console.log("Handle the userData", userData)
             let SID = {};
             SID.userEmail = userData.email;
             SID.name = userData.name;
-            SID.picture = userData.picture;           
-            setUser(SID);           
+            SID.picture = userData.picture;    
+            cookies.set('_UID_',JSON.stringify(SID),'1d');      
+            router.push({ path: 'dashboard'})
           }
     return{
         callback,
@@ -44,14 +44,11 @@ export default{
         cookies ,
     }
   },
-  methods:{
-    setUser(uid){
-      this.cookies.set('_UID_',JSON.stringify(uid),'1d')
-      this.router.push({ path: 'dashboard'})
-      
+  mounted(){
+    if(this.cookies.isKey('_UID_')){
+      this.router.push({name:'dashboard'})
     }
   }
-
 }
 
 </script>

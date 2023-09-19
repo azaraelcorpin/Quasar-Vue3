@@ -14,28 +14,26 @@
         <q-toolbar-title>
           <div v-if="$q.screen.width >= 550" >Strategic Performance Management System</div>
           <div v-else >SPMS</div>
-          
         </q-toolbar-title>
-
         <q-btn   padding="0" round >
-          <q-avatar size="32px">
-                  <img src="https://cdn.quasar.dev/img/avatar4.jpg">
+          <q-avatar size="40px" v-if="$route.name !== 'signIn'" >
+                  <img :src="profilePicture()">
           </q-avatar>
           <q-menu>
             <div class="row no-wrap q-pa-md">
               <div class="column items-center">
                 <q-avatar size="72px">
-                  <img src="https://cdn.quasar.dev/img/avatar4.jpg">
+                  <img :src="profilePicture()">
                 </q-avatar>
-
-                <div class="text-subtitle1 q-mt-md q-mb-xs">John Doe</div>
-
+                <div class="text-subtitle1 q-mt-md q-mb-xs">{{ cookies.isKey('_UID_')?cookies.get('_UID_').name:'Un Identified' }}</div>
+                <div >{{ cookies.isKey('_UID_')?cookies.get('_UID_').userEmail:'Un Identefied' }}</div>
                 <q-btn
-                  color="primary"
+                  color="black"
                   label="Logout"
                   push
                   size="sm"
                   v-close-popup
+                  @click="signOut"
                 ></q-btn>
               </div>
             </div>
@@ -135,6 +133,8 @@
 <script>
 import { defineComponent, ref } from 'vue'
 import routes from 'src/router/routes'
+import { useCookies } from "vue3-cookies";
+import { useRouter } from 'vue-router'
 
 
 export default defineComponent({
@@ -146,15 +146,34 @@ export default defineComponent({
   setup () {
     const leftDrawerOpen = ref(false)
     const miniState = ref(true)
+    const { cookies } = useCookies();
+    const router = useRouter();
     return {
       routes,
+      router,
       leftDrawerOpen,
       miniState,
+      cookies,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }
     }
-  }
+  },
+  methods:{
+    signOut(){
+      this.cookies.remove('_UID_');
+      this.router.push({name:'signIn'});
+    },
+    profilePicture(){
+      if(this.cookies.isKey('_UID_')){
+        if(this.cookies.get('_UID_').picture){
+          return this.cookies.get('_UID_').picture
+        }
+      }
+      return "https://cdn.quasar.dev/img/avatar4.jpg";
+    },    
+
+  },
 })
 </script>
 <style>

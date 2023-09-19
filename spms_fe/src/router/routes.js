@@ -62,11 +62,21 @@ const routes = [
   // but you can also remove it
   {
     path: '/:catchAll(.*)*',
+    name:'catchAll',
     component: () => import('pages/ErrorNotFound.vue'),
     meta:{
       title:'tests',
     },
     icon:'error',
+    visible:false,
+  },
+  {
+    path: '/signIn',
+    name:'signIn',
+    component: () => import('pages/LandingPage.vue'),
+    meta:{
+      title:'Sign In',
+    },
     visible:false,
   }
 ]

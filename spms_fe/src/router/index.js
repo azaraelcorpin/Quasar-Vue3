@@ -1,6 +1,7 @@
 import { route } from 'quasar/wrappers'
 import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
 import routes from './routes'
+import { useCookies } from "vue3-cookies";
 
 /*
  * If not building with SSR mode, you can
@@ -12,6 +13,7 @@ import routes from './routes'
  */
 
 export default route(function (/* { store, ssrContext } */) {
+  const { cookies } = useCookies()
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
@@ -28,7 +30,12 @@ export default route(function (/* { store, ssrContext } */) {
 
   Router.beforeEach((to, from, next) => {
     document.title = process.env.VUE_APP_NAME+'-'+to.meta.title;
-    next();
+    if(to.name === 'signIn' || to.name === 'catchAll' || cookies.isKey('_UID_'))
+      next();
+    else{
+      document.title = process.env.VUE_APP_NAME+'-'+'Sign In';
+      next({name:'signIn'})
+    }
   })
   return Router
 })
