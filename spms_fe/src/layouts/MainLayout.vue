@@ -131,10 +131,11 @@
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, onMounted,onBeforeUnmount} from 'vue'
 import routes from 'src/router/routes'
 import { useCookies } from "vue3-cookies";
 import { useRouter } from 'vue-router'
+import Swal from 'sweetalert2';
 
 
 export default defineComponent({
@@ -148,6 +149,23 @@ export default defineComponent({
     const miniState = ref(true)
     const { cookies } = useCookies();
     const router = useRouter();
+    let intervalId;
+    const monitorCookie = () => {
+      intervalId = setInterval(() => {
+        console.log('Monitoring',cookies.isKey('_UID_'))
+        if(!cookies.isKey('_UID_')){                    
+              router.push({name:'signIn'});
+        }
+      }, 5000); // Check every second
+    };
+    onMounted(() => {
+      monitorCookie();
+    });
+
+    // Clear the interval on component unmount to prevent memory leaks
+    onBeforeUnmount(() => {
+      clearInterval(intervalId);
+    });
     return {
       routes,
       router,
