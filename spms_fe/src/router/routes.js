@@ -57,6 +57,26 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/sysadm',
+    component: () => import('pages/sysAdmin/SysAdmin.vue'),
+    meta:{
+      title:'System Admin',
+    },
+    icon:'settings',
+    visible:true,
+    children:[
+      {
+        path: '/user',
+        component: () => import('pages/sysAdmin/UserMgt.vue'),
+        meta:{
+          title:'Users',
+        },
+        icon:'manage_accounts',
+        visible:true,
+      },
+    ],
+  },
 
   // Always leave this as last one,
   // but you can also remove it

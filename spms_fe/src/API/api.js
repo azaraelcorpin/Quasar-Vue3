@@ -20,7 +20,7 @@ export default {
             confirmButtonText: 'OK'
           }).then((result) => {
             if (result.isConfirmed) {
-              window.location.reload();
+              return
             }
           });          
       return null;
@@ -39,25 +39,108 @@ export default {
     }
   },
 
+  validateResponse(response){
+    console.log('res',response)
+    if(response.status === 401){
+      
+      localStorage.removeItem('routeParams');
+      Swal.fire({
+        title: 'Unauthorized',
+        text: 'Please log in again',
+        icon: 'error',
+        confirmButtonText: 'OK',
+        allowOutsideClick:false,
+        timer:5000,
+      })
+      setTimeout(function() {
+        cookies.remove('_UID_');
+      }, 1000); // 5000 milliseconds = 5 seconds         
+    }
+  },
 
-  ///// start leave type
+
+  ///// test 
   async test(userEmail) {
     var url = api_url+'/user/all'
     const config = await this.getAuthorization(userEmail);
     const body = { }
     try {      
-      const response = await axios.post(url, body, config);
+      const response = await axios.post(url, body, config);      
       if (response && response.data && response.status == 200) {
         return response.data;
-      } else if (response && response.data && response.data.message) {
-        return { error: response.data.message };
-      } else {
-        return { error: "Sorry. Error on checking account." };
+      } else{
+        console.log(response);
+        return {error:response}
       }
     } catch (error) {
-      console.log(error);
+      console.log(error.response);
+      this.validateResponse(error.response)
       return { error: error.response }
     }
   },
+
+    ///// generate session Id
+    async generateSessionId(userEmail) {
+      var url = api_url+'/user/getSessionId'
+      const config = await this.getAuthorization(userEmail);
+      const body = { }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log(response);
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },  
+
+        ///// new User
+    async newUser(param) {
+      var url = api_url+'/user/new'
+      const config = await this.getAuthorization(userEmail);
+      const body = {
+        email:param.email,
+        userName:param.userName,
+        userType:param.userType,
+        officeId:param.officeId,
+        privileges:param.privileges,
+       }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log(response);
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },  
+
+    ///// getAllUser 
+    async getAllUser() {
+      var url = api_url+'/user/all'
+      const config = await this.getAuthorization();
+      const body = { }
+      try {      
+        const response = await axios.post(url, body, config);      
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log(response);
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        this.validateResponse(error.response)
+        return { error: error.response }
+      }
+    },    
 
 }

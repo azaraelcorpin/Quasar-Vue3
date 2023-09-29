@@ -135,7 +135,6 @@ import { defineComponent, ref, onMounted,onBeforeUnmount} from 'vue'
 import routes from 'src/router/routes'
 import { useCookies } from "vue3-cookies";
 import { useRouter } from 'vue-router'
-import Swal from 'sweetalert2';
 
 
 export default defineComponent({

@@ -16,6 +16,8 @@ import { GoogleLogin } from 'vue3-google-login';
 import { decodeCredential } from 'vue3-google-login';
 import { useRouter } from 'vue-router'
 import { useCookies } from "vue3-cookies";
+import { useQuasar } from 'quasar'
+import api from "src/API/api";
 
 
 
@@ -25,9 +27,10 @@ export default{
     GoogleLogin
   },
   setup(){
+          const $q = useQuasar()
           const { cookies } = useCookies();
           const router = useRouter();
-          const callback = (response) => {
+          const callback = async (response) => {
             // This callback will be triggered when the user selects or login to
             // his Google account from the popup
             const userData = decodeCredential(response.credential)
@@ -35,9 +38,32 @@ export default{
             SID.userEmail = userData.email;
             SID.name = userData.name;
             SID.picture = userData.picture;    
-            cookies.set('_UID_',JSON.stringify(SID),'1d');      
-            router.push({ path: 'dashboard'})
-          }
+            console.log(!SID.userEmail.includes('@msugensan.edu.ph'))
+            if(!SID.userEmail.includes('@msugensan.edu.ph'))
+              {
+                $q.dialog({
+                title: 'Unauthorized',
+                message: 'Account Not Found',
+                  ok: {
+                    push: true,
+                    color: 'negative'
+                  },
+              })
+              }
+              else{
+                try {
+                  let response = await api.generateSessionId(SID);
+                  console.log('sid',response)
+                  let sid=response.sessionId;
+                  SID.sid=sid
+                  cookies.set('_UID_',JSON.stringify(SID),'1d');      
+                  router.push({ path: 'dashboard'})
+                } catch (error) {
+                  console.log('error',error)
+                }
+              }
+          };
+          
     return{
         callback,
         router,

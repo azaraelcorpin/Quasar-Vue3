@@ -1,7 +1,7 @@
 <template>
   <q-page class="flex flex-center" style="background-color: aquamarine;">
     Dashboard
-    <q-btn @click="test('fsd')">TEST</q-btn>
+    <q-btn @click="test()">TEST</q-btn>
   </q-page>
 </template>
 
