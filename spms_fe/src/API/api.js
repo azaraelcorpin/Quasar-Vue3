@@ -89,7 +89,7 @@ export default {
         if (response && response.data && response.status == 200) {
           return response.data;
         } else{
-          console.log(response);
+          console.log('generatedSessionId Error');
           return {error:response}
         }
       } catch (error) {
@@ -101,12 +101,12 @@ export default {
         ///// new User
     async newUser(param) {
       var url = api_url+'/user/new'
-      const config = await this.getAuthorization(userEmail);
+      const config = await this.getAuthorization();
       const body = {
         email:param.email,
         userName:param.userName,
         userType:param.userType,
-        officeId:param.officeId,
+        officeId:param.officeId.id,
         privileges:param.privileges,
        }
       try {      
@@ -114,7 +114,7 @@ export default {
         if (response && response.data && response.status == 200) {
           return response.data;
         } else{
-          console.log(response);
+          console.log('newUser Error');
           return {error:response}
         }
       } catch (error) {
@@ -142,5 +142,25 @@ export default {
         return { error: error.response }
       }
     },    
+
+    ///// getAllOffice 
+    async getAllOffice() {
+      var url = api_url+'/office/all'
+      const config = await this.getAuthorization();
+      const body = { }
+      try {      
+        const response = await axios.post(url, body, config);      
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log(response);
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        this.validateResponse(error.response)
+        return { error: error.response }
+      }
+    },     
 
 }

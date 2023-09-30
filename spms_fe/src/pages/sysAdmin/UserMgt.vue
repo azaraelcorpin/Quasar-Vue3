@@ -24,7 +24,7 @@
               <q-form @submit="newUser" @reset="newUserReset">
                 <q-page-container style="padding:10px;" >                
                   <div class="text-h5" style="margin: 5px;">New User</div> 
-
+                  {{ NEW_USER.officeId }}
                   <q-input 
                     required 
                     label="Email" 
@@ -47,7 +47,7 @@
                     class="q-pa-sm" 
                     color="primary" 
                     v-model="NEW_USER.userName"
-                    :rules="[rules.requiredField,rules.notEmpty]"
+                    :rules="[rules.requiredField,rules.notEmpty,rules.noSpaceStart]"
                     >
                     <template v-slot:prepend>
                       <q-icon name="person_outline" />
@@ -70,7 +70,8 @@
 
                   <q-select 
                     outlined  
-                    :options="['OC','ICTO','HR','OVCAA']" 
+                    :options="offices" 
+                    option-label="code"
                     label="Office" 
                     class="q-pa-sm" 
                     color="primary"  
@@ -106,10 +107,13 @@
   <script>
   import { defineComponent } from 'vue'  
   import api from "src/API/api";
+  import { useQuasar } from 'quasar'
   
   export default defineComponent({
     name: 'UserMgt',
-
+    setup(){
+      const $q = useQuasar();
+    },
     methods:{
       async test(para){
         try {
@@ -119,8 +123,36 @@
           console.log('error',error)
         }
       },
-      newUser(){
-        alert('go')
+
+      async queryOffices(){
+        try {
+          this.loading = true;
+          let response = await api.getAllOffice();
+          console.log('getOffices', response.message)
+          this.offices = response.OFFICES;
+        } catch (error) {
+          console.log('error',error)
+        }
+      },
+
+      async newUser(){
+        try {
+          let response = await api.newUser(this.NEW_USER);
+          console.log('newUser',response)
+          if(response.error){
+            this.$q.dialog({
+                title: response.error.data.status,
+                message: response.error.data.message,
+                  ok: {
+                    push: true,
+                    color: 'negative'
+                  },
+              })
+          }
+          
+        } catch (error) {
+          console.log('error',error)
+        }
       },
       newUserReset(){
         this.NEW_USER={
@@ -138,7 +170,8 @@
         newUserDialog:false,
         rules: {
                 noSpace: v => (!v?.includes(' ')) || "No space allowed.",
-                notEmpty:(v) => (v && v.replaceAll(' ','').length > 0) || "Empty Value.",
+                notEmpty:(v) => (v && v.replaceAll(' ','').length > 0) ||  "Empty Value.",
+                noSpaceStart:(v) => (v && v.charAt(0) != ' ') || "No space allowed at start",
                 requiredField: v => !!v || "Required field.", 
                 requiredSelection: v => !!v || "Required at least one selection",
                 properEmail: v => !v || /^\w+([.-]?\w+)*@msugensan\.edu\.ph$/.test(v) ||  'E-mail must be valid. Ex. juandelacruz@msugensan.edu.ph',
@@ -155,8 +188,12 @@
               userName:null,
               userType:null,
               officeId:null,
-            }
+            },
+        offices:[],
       };
+    },
+    mounted(){
+      this.queryOffices();
     }
   })
   </script>
