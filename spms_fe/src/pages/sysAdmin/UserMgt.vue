@@ -24,7 +24,6 @@
               <q-form @submit="newUser" @reset="newUserReset">
                 <q-page-container style="padding:10px;" >                
                   <div class="text-h5" style="margin: 5px;">New User</div> 
-                  {{ NEW_USER.officeId }}
                   <q-input 
                     required 
                     label="Email" 
@@ -107,6 +106,7 @@
   <script>
   import { defineComponent } from 'vue'  
   import api from "src/API/api";
+  import dialog from "src/plugins/myDialog"
   import { useQuasar } from 'quasar'
   
   export default defineComponent({
@@ -138,16 +138,13 @@
       async newUser(){
         try {
           let response = await api.newUser(this.NEW_USER);
-          console.log('newUser',response)
+          console.log('newUser',response)          
           if(response.error){
-            this.$q.dialog({
-                title: response.error.data.status,
-                message: response.error.data.message,
-                  ok: {
-                    push: true,
-                    color: 'negative'
-                  },
-              })
+            dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
+          }else{
+            dialog.positive(this.$q,response.status,response.message).onOk(()=>{
+              this.newUserReset();
+            }) ;
           }
           
         } catch (error) {
