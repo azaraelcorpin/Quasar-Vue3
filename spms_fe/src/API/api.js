@@ -39,23 +39,34 @@ export default {
     }
   },
 
-  validateResponse(response){
+  validateResponse(error){
+    let response = error.response
     console.log('res',response)
-    if(response.status === 401){
-      
-      localStorage.removeItem('routeParams');
+    if(response){
+      if(response & response.status === 401){      
+        localStorage.removeItem('routeParams');
+        Swal.fire({
+          title: 'Unauthorized',
+          text: 'Please log in again',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          allowOutsideClick:false,
+          timer:5000,
+        })
+        setTimeout(function() {
+          cookies.remove('_UID_');
+        }, 1000); // 5000 milliseconds = 5 seconds         
+      }
+    }else{
       Swal.fire({
-        title: 'Unauthorized',
-        text: 'Please log in again',
+        title: error.name,
+        text: error.message,
         icon: 'error',
         confirmButtonText: 'OK',
         allowOutsideClick:false,
-        timer:5000,
       })
-      setTimeout(function() {
-        cookies.remove('_UID_');
-      }, 1000); // 5000 milliseconds = 5 seconds         
     }
+    
   },
 
 
@@ -93,8 +104,8 @@ export default {
           return {error:response}
         }
       } catch (error) {
-        console.log(error.response);
-        return { error: error.response }
+        console.log('error',error.message);
+        return { error }
       }
     },  
 
@@ -138,7 +149,7 @@ export default {
         }
       } catch (error) {
         console.log(error.response);
-        this.validateResponse(error.response)
+        this.validateResponse(error)
         return { error: error.response }
       }
     },    
@@ -157,9 +168,9 @@ export default {
           return {error:response}
         }
       } catch (error) {
-        console.log(error.response);
-        this.validateResponse(error.response)
-        return { error: error.response }
+        console.log(error);
+        this.validateResponse(error)
+        return { error: error.response }??error
       }
     },     
 
