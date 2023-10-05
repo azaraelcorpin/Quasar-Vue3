@@ -234,7 +234,10 @@
               this.testObj.office = this.NEW_USER.officeId.code
               this.testObj.user_type = this.NEW_USER.userType
               this.testObj.status = this.NEW_USER.status
-              this.newUserReset();
+              dialog.positive(this.$q,"Accepted",'Successfully Updated').onOk(()=>{
+                this.newUserReset();
+                }) ;
+              
               // this.loading = true;
               // let response = await api.deleteUser(param);
               // console.log('updateUser',response)          
