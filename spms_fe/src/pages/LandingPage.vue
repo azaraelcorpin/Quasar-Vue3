@@ -77,7 +77,7 @@ export default{
         callback,
         router,
         cookies ,
-        loading
+        loading,
     }
   },
   mounted(){

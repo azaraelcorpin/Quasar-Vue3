@@ -134,6 +134,27 @@ export default {
       }
     },  
 
+       ///// Delete User
+    async deleteUser(param) {
+      var url = api_url+'/user/delete'
+      const config = await this.getAuthorization();
+      const body = {
+        email:param.email,
+       }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('newUser Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },  
+
     ///// getAllUser 
     async getAllUser() {
       var url = api_url+'/user/all'
@@ -150,7 +171,7 @@ export default {
       } catch (error) {
         console.log(error.response);
         this.validateResponse(error)
-        return { error: error.response }
+        return { error: error.response }??error
       }
     },    
 

@@ -117,7 +117,8 @@
     </q-scroll-area>
     </q-drawer>
 
-    <q-page-container>
+    <q-page-container >
+      <div class="custom"></div>
       <Transition 
         name="fade-transform"
         mode="out-in"
@@ -204,4 +205,27 @@ export default defineComponent({
 .drawer-with-bg.active {
   color: #12e246; /* Bright blue font color for active elements */
 }
+.custom {
+  /* Fixed position */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  /* Background color with opacity */
+  background-color: rgba(255, 0, 0, 0.5); /* Red color with 50% opacity */
+
+  /* Other styles */
+  width: 200px; /* Set the width as needed */
+  height: 200px; /* Set the height as needed */
+  text-align: center; /* Optional: Center text horizontally */
+
+  /* Z-index */
+  z-index: 1; /* Adjust the z-index as needed */
+  pointer-events: none;
+  background: url( '../assets/MSU_Gensan_logo.png') no-repeat center center;
+  background-size: cover;
+  opacity: 0.1;
+}
+
 </style>

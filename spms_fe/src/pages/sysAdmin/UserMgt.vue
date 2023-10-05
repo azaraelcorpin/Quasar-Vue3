@@ -5,25 +5,21 @@
       </q-inner-loading>
 
         <!-- Test button -->
-      <q-btn @click="loading=!loading" style="  position: fixed;right: 1%; z-index: 1000;">
+      <!-- <q-btn @click="loading=!loading" style="  position: fixed;right: 1%; z-index: 1000;">
         loading test
-      </q-btn>
+      </q-btn> -->
       <!-- test button -->
 
       <q-card class="pa-1">      
 
-        <q-card-section class="container--fluid">
-          <div class="text-h4">User Management</div>
-        </q-card-section>
-        <q-separator></q-separator>
-        <q-card-section class="container--fluid">
-          <q-btn push color="primary" @click="newUserDialog = !newUserDialog">New User</q-btn>
+        <q-card-section class="container--fluid" style="height: 89vh;">
+          <div class="text-h4">User Management </div>
           <!-- new User dialog -->
           <q-dialog v-model="newUserDialog" persistent >
-            <q-card style="width: 50%;" >   
+            <q-card  :style="{ width: $q.screen.xs ? '100%' : '50%' }" >   
               <q-form @submit="newUser" @reset="newUserReset">
                 <q-page-container style="padding:10px;" >                
-                  <div class="text-h5" style="margin: 5px;">New User</div> 
+                  <div class="text-h5" style="margin: 5px;">{{!NEW_USER.email_old?'New ':'Update '}} User</div> 
                   <q-input 
                     required 
                     label="Email" 
@@ -82,8 +78,13 @@
                     </template>                
                   </q-select>
 
+                  <div class="q-gutter-sm" v-if="NEW_USER.email_old">
+                    <q-radio v-model="NEW_USER.status" val="Active" label="Active" />
+                    <q-radio v-model="NEW_USER.status" val="Inactive" label="Inactive" />
+                  </div>
                   <div style="display: flex; justify-content: flex-end;">
-                    <q-btn class="q-ma-md" color="primary" type="submit">Save</q-btn>
+                    <q-btn class="q-ma-md" color="primary" v-if="NEW_USER.email_old" @click="updateUser">Update</q-btn>
+                    <q-btn class="q-ma-md" color="primary" v-else type="submit">Save</q-btn>
                     <q-btn class="q-ma-md" type="reset">Cancel</q-btn>
                   </div>
 
@@ -92,12 +93,67 @@
             </q-card>
           </q-dialog>
           <!-- end dialog -->
-
           <!-- user list table  -->
+            <q-table
+              class="my-sticky-header-table"
+              :grid="$q.screen.xs"
+              :rows="userlist"
+              :columns="header"
+              row-key="email"
+              :rows-per-page-options="[ 10, 1, 15, 20, 25, 50, 0 ]"
+              :filter="filter"
+              :style="{height: $q.screen.xs ? '90.5%' : '96.5%', 'overflow-y': 'auto'}"
+              virtual-scroll-sticky-size-start="100"
+            >
+
+              <template v-slot:body-cell-action="props">
+                <q-td :props="props">
+                  <q-btn color="positive" icon="edit" round flat @click="showUpdateUserDialog(props.row)"></q-btn>
+                  <q-btn color="negative" icon="delete" round flat @click="deleteUser(props.row)"></q-btn>
+                </q-td>
+              </template>   
+              <template v-slot:top>
+                <q-btn push color="primary" @click=" newUserReset(), newUserDialog = !newUserDialog">New User</q-btn>
+                  <q-space />
+                  <q-input dense debounce="300" color="primary" v-model="filter" placeholder="Search">
+                    <template v-slot:append>
+                      <q-icon name="search" />
+                    </template>
+                  </q-input>
+              </template>
+
+              <!-- ↓↓↓↓↓ this is for gridview such as viewing on small screen like android -->
+              <template v-slot:item="props">
+                <q-card style="width: 100%;height:min-content;" class="q-ma-sm">
+                  <q-list dense>
+                    <q-item v-for="col in props.cols" :key="col.name">
+                      <q-item-section>
+                        <q-item-label>{{ col.label }}</q-item-label>
+                      </q-item-section>
+                      <q-item-section side>
+                        <q-chip v-if="col.name === 'status'"
+                          :color="props.row.status == 'Active' ? 'green': props.row.status == 'Disable' ? 'red': 'grey'"
+                          text-color="white"
+                          dense
+                          class="text-weight-bolder"
+                          square
+                        >{{col.value}}
+                        </q-chip>
+                        <div v-else-if="col.name === 'action'"  class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+                          <q-btn color="positive" icon="edit" round flat @click="showUpdateUserDialog(props.row)"></q-btn>
+                          <q-btn color="negative" icon="delete" round flat @click="deleteUser(props.row)"></q-btn>
+                        </div>
+                        <q-item-label v-else caption :class="col.classes ? col.classes : ''">{{ col.value }}</q-item-label>
+                      </q-item-section>
+                    </q-item>
+                  </q-list>
+                </q-card>
+
+              </template>
+              <!-- ↑↑↑↑↑ this is for gridview such as viewing on small screen like android -->
+
+            </q-table>
           <!-- end list table  -->
-        </q-card-section>
-        <q-card-section  class="container--fluid text-center custom-container flex flex-center"> 
-          content here
         </q-card-section>
       </q-card>
     </q-page>
@@ -113,15 +169,15 @@
     name: 'UserMgt',
     setup(){
       const $q = useQuasar();
+      return{
+        dialog
+      }
     },
     methods:{
-      async test(para){
-        try {
-          let response = await api.test();
-          console.log('response',response)
-        } catch (error) {
-          console.log('error',error)
-        }
+       test(evt, row){
+        console.log({...row})
+        row.office = new Date().toUTCString()
+
       },
 
       async queryOffices(){
@@ -133,10 +189,24 @@
         } catch (error) {
           console.log('error',error)
         }
+        this.loading = false;
+      },
+
+      async queryUserList(){
+        try {
+          this.loading = true;
+          let response = await api.getAllUser();
+          console.log('getAllUser', response.message)
+          this.userlist = response.USERS;
+        } catch (error) {
+          console.log('error',error)
+        }
+        this.loading = false;
       },
 
       async newUser(){
         try {
+          this.loading = true;
           let response = await api.newUser(this.NEW_USER);
           console.log('newUser',response)          
           if(response.error){
@@ -144,26 +214,99 @@
           }else{
             dialog.positive(this.$q,response.status,response.message).onOk(()=>{
               this.newUserReset();
+              this.queryUserList();
             }) ;
           }
           
         } catch (error) {
           console.log('error',error)
         }
+        this.loading = false;
       },
+
+       updateUser(){
+        try {
+          this.loading = true;
+          dialog.confirm(this.$q,"Confirmation","Would you like to update this user?")
+          .onOk(() => {
+              this.testObj.email = this.NEW_USER.email
+              this.testObj.username = this.NEW_USER.userName
+              this.testObj.office = this.NEW_USER.officeId.code
+              this.testObj.user_type = this.NEW_USER.userType
+              this.testObj.status = this.NEW_USER.status
+              this.newUserReset();
+              // this.loading = true;
+              // let response = await api.deleteUser(param);
+              // console.log('updateUser',response)          
+              // if(response.error){
+              //   dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
+              // }else{
+              //   dialog.positive(this.$q,response.status,response.message).onOk(()=>{
+              //     this.queryUserList();
+              //   }) ;
+              // }
+            })               
+        } catch (error) {
+          console.log('error',error)
+        }
+        this.loading = false;
+      },      
+
+      async deleteUser(param){
+        try {
+
+          dialog.confirm(this.$q,"Confirmation","Would you like to delete "+param.email+"?")
+          .onOk(async() => {
+              this.loading = true;
+              let response = await api.deleteUser(param);
+              console.log('deleteUser',response)          
+              if(response.error){
+                dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
+              }else{
+                dialog.positive(this.$q,response.status,response.message).onOk(()=>{
+                  this.queryUserList();
+                }) ;
+              }
+            })
+          .onCancel(() => {
+            return
+          }) 
+          
+        } catch (error) {
+          console.log('error',error)
+        }
+        this.loading = false;
+      },
+
+      showUpdateUserDialog(row){
+        this.testObj = row;
+        let tmp = {...row};
+        this.NEW_USER.email = tmp.email;
+        this.NEW_USER.userName = tmp.username;
+        this.NEW_USER.userType = tmp.user_type;
+        this.NEW_USER.officeId = this.offices.find((office)=> office.id === tmp.office_id);
+        this.NEW_USER.email_old = tmp.email;
+        this.NEW_USER.status = tmp.status;
+        this.newUserDialog = true;
+      },
+
       newUserReset(){
         this.NEW_USER={
               email:null,
               userName:null,
               userType:null,
               officeId:null,
+              email_old:null,
+              status:null,
             }
             this.newUserDialog = false;
       }
     },
     data(){
       return {
-        loading:true,
+        testObj:{},
+        filter:"",
+        loading:false,
         newUserDialog:false,
         rules: {
                 noSpace: v => (!v?.includes(' ')) || "No space allowed.",
@@ -185,18 +328,80 @@
               userName:null,
               userType:null,
               officeId:null,
+              email_old:null,
+              status:null,
             },
         offices:[],
+        header : [
+            {
+              name: 'email',
+              label: 'Email',
+              align: 'left',
+              field: 'email',
+              sortable: true
+            },
+            {
+              name: 'userName',
+              label: 'Fullname',
+              align: 'left',
+              field: 'username',
+              sortable: true
+            },
+            {
+              name: 'userType',
+              label: 'User Type',
+              align: 'left',
+              field: 'user_type',
+              sortable: true
+            },
+            {
+              name: 'office',
+              label: 'Office',
+              align: 'left',
+              field: 'office',
+              sortable: true
+            },
+            {
+              name: 'status',
+              label: 'Status',
+              align: 'left',
+              field: 'status',
+              sortable: true
+            },
+            {
+              name: 'action',
+              label: 'Action',
+              align: 'center',
+            },
+          ],
+        userlist:[],
       };
     },
     mounted(){
       this.queryOffices();
+      this.queryUserList();
     }
   })
   </script>
   <style>
     .custom-container {
-        height: 80vh;
+        height: 89vh;
       }
+    .my-sticky-header-table .q-table__middle {
+      max-height: 89vh;
+    }
+    .my-sticky-header-table .q-table__top,
+    .my-sticky-header-table .q-table__bottom,
+    .my-sticky-header-table thead tr:first-child th {
+      background-color: #ffffff;
+      z-index: 1000;
+    }
+    .my-sticky-header-table thead tr:first-child th {
+      position: sticky;
+      top: 0;
+    }
+    .grid-style-transition {
+      transition: transform 0.28s, background-color 0.28s;
+    }
   </style>
   
