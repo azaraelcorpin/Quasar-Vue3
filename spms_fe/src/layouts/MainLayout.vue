@@ -118,7 +118,7 @@
     </q-drawer>
 
     <q-page-container >
-      <div class="custom"></div>
+      <div class="custom">SPMS</div>
       <Transition 
         name="fade-transform"
         mode="out-in"
@@ -226,6 +226,7 @@ export default defineComponent({
   background: url( '../assets/MSU_Gensan_logo.png') no-repeat center center;
   background-size: cover;
   opacity: 0.1;
+  
 }
 
 </style>

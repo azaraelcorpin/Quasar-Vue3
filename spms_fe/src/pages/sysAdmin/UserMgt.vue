@@ -207,6 +207,7 @@
       async newUser(){
         try {
           this.loading = true;
+          console.log(this.NEW_USER);
           let response = await api.newUser(this.NEW_USER);
           console.log('newUser',response)          
           if(response.error){
@@ -224,30 +225,26 @@
         this.loading = false;
       },
 
-       updateUser(){
+      async updateUser(){
         try {
           this.loading = true;
           dialog.confirm(this.$q,"Confirmation","Would you like to update this user?")
-          .onOk(() => {
-              this.testObj.email = this.NEW_USER.email
-              this.testObj.username = this.NEW_USER.userName
-              this.testObj.office = this.NEW_USER.officeId.code
-              this.testObj.user_type = this.NEW_USER.userType
-              this.testObj.status = this.NEW_USER.status
-              dialog.positive(this.$q,"Accepted",'Successfully Updated').onOk(()=>{
-                this.newUserReset();
+          .onOk(async() => {
+              let response = await api.updateUser(this.NEW_USER);
+              console.log('updateUser',response)      
+              if(response.error){
+                dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
+              }else{
+                dialog.positive(this.$q,response.status,response.message).onOk(()=>{
+                  // this.queryUserList();
+                  this.testObj.email = this.NEW_USER.email
+                  this.testObj.username = this.NEW_USER.userName
+                  this.testObj.office = this.NEW_USER.officeId.code
+                  this.testObj.user_type = this.NEW_USER.userType
+                  this.testObj.status = this.NEW_USER.status
+                  this.newUserReset();
                 }) ;
-              
-              // this.loading = true;
-              // let response = await api.deleteUser(param);
-              // console.log('updateUser',response)          
-              // if(response.error){
-              //   dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
-              // }else{
-              //   dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-              //     this.queryUserList();
-              //   }) ;
-              // }
+              }                                           
             })               
         } catch (error) {
           console.log('error',error)

@@ -134,6 +134,32 @@ export default {
       }
     },  
 
+    async updateUser(param) {
+      var url = api_url+'/user/update'
+      const config = await this.getAuthorization();
+      const body = {
+        email:param.email,
+        userName:param.userName,
+        userType:param.userType,
+        officeId:param.officeId.id,
+        privileges:param.privileges,
+        status:param.status,
+        email_old:param.email_old,
+       }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('newUser Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },      
+
        ///// Delete User
     async deleteUser(param) {
       var url = api_url+'/user/delete'
