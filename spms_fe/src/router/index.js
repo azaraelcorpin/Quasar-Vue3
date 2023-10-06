@@ -2,6 +2,57 @@ import { route } from 'quasar/wrappers'
 import { createRouter, createMemoryHistory, createWebHistory, createWebHashHistory } from 'vue-router'
 import routes from './routes'
 import { useCookies } from "vue3-cookies";
+import myDialog from 'src/plugins/myDialog';
+import { useQuasar } from 'quasar';
+
+// Define the function to handle route navigation and document title changes
+function handleRouteNavigationAndTitleChange(to, from, next) {
+  const { cookies } = useCookies();
+
+  document.title = process.env.VUE_APP_NAME + '-' + to.meta.title;
+  
+  if (to.name === 'signIn'|| to.name === 'accessDenied' || to.name === 'catchAll' || cookies.isKey('_UID_')) {
+    
+    if(cookies.isKey('_UID_') && !(to.name === 'signIn'|| to.name === 'accessDenied' || to.name === 'catchAll'))
+      checkRoles(to,from,next)
+    else
+    next();
+  } else {
+    document.title = process.env.VUE_APP_NAME + '-' + 'Sign In';
+    next({ name: 'signIn' });
+  }
+}
+
+// Define the function to check user roles
+function checkRoles(to, from, next) {
+  const requiredRoles = to.meta.roles;
+  // Check if the route has required roles defined in its meta property
+  if (requiredRoles && requiredRoles.length > 0) {
+    // Check if the user has the required role
+    // next(false);
+    const userRoles = JSON.parse(localStorage.getItem('userRoles')); // Assuming you store user roles in localstorage
+    const hasRequiredRole =userRoles?requiredRoles.some(role => userRoles.includes(role)):null;
+    const ImDev = localStorage.getItem('ImDev');
+    if (hasRequiredRole || ImDev) {
+      // User has the required role, allow access to the route
+      next();
+    } else {
+      // User does not have the required role, deny access or redirect to an access denied page
+      const $q = useQuasar();
+        myDialog.negative($q,"Forbidden","Access Denied on "+to.meta.title).onOk(()=>{
+          let prevRouteRole = userRoles?requiredRoles.some(role => userRoles.includes(role)):null;
+          if(prevRouteRole)
+            next(false);
+          else
+            next({name:'home'})
+        }) ;      
+    }
+  } else {
+    // No specific roles required for this route, allow access
+    next();
+  }
+}
+
 
 /*
  * If not building with SSR mode, you can
@@ -13,7 +64,6 @@ import { useCookies } from "vue3-cookies";
  */
 
 export default route(function (/* { store, ssrContext } */) {
-  const { cookies } = useCookies()
   const createHistory = process.env.SERVER
     ? createMemoryHistory
     : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory)
@@ -28,14 +78,7 @@ export default route(function (/* { store, ssrContext } */) {
     history: createHistory(process.env.VUE_ROUTER_BASE)
   })
 
-  Router.beforeEach((to, from, next) => {
-    document.title = process.env.VUE_APP_NAME+'-'+to.meta.title;
-    if(to.name === 'signIn' || to.name === 'catchAll' || cookies.isKey('_UID_'))
-      next();
-    else{
-      document.title = process.env.VUE_APP_NAME+'-'+'Sign In';
-      next({name:'signIn'})
-    }
-  })
-  return Router
+  Router.beforeEach(handleRouteNavigationAndTitleChange);
+
+  return Router;
 })

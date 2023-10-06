@@ -2,9 +2,11 @@
 const routes = [
   {
     path: '/',
+    name:'home',
     component: () => import('pages/IndexPage.vue'),
     meta:{
       title:'Home',
+      roles:[]
     },
     icon:'home',
     visible:false,
@@ -15,6 +17,7 @@ const routes = [
     component: () => import('pages/TestPage.vue'),
     meta:{
       title:'Dashboard',
+      roles:[]
     },
     icon:'dashboard',
     visible:true,
@@ -24,15 +27,17 @@ const routes = [
     component: () => import('pages/TestPages.vue'),
     meta:{
       title:'My PCR',
+      roles:['INDIVIDUAL']
     },
     icon:'person',
     visible:true,
   },
   {
-    path: '/office',
+    path: '/myOffice',
     component: () => import('pages/TestPages.vue'),
     meta:{
-      title:'Office',
+      title:'My Office',
+      roles:['OFFICE_HEAD','OFFICE_STAFF']
     },
     icon:'domain',
     visible:true,
@@ -58,10 +63,50 @@ const routes = [
     ],
   },
   {
+    path: '/PMT',
+    component: () => import('pages/sysAdmin/SysAdmin.vue'),
+    meta:{
+      title:'PMT',
+      roles:['PMT']
+    },
+    icon:'admin_panel_settings',
+    visible:true,
+    children:[
+      {
+        path: '/pcr_sched',
+        component: () => import('pages/sysAdmin/UserMgt.vue'),
+        meta:{
+          title:'PCR Schedule',
+        },
+        icon:'schedule',
+        visible:true,
+      },
+      {
+        path: '/mfo',
+        component: () => import('pages/sysAdmin/UserMgt.vue'),
+        meta:{
+          title:'MFO',
+        },
+        icon:'checklist',
+        visible:true,
+      },
+      {
+        path: '/commitments',
+        component: () => import('pages/sysAdmin/UserMgt.vue'),
+        meta:{
+          title:'Commitments',
+        },
+        icon:'task',
+        visible:true,
+      },
+    ],
+  },
+  {
     path: '/sysadm',
     component: () => import('pages/sysAdmin/SysAdmin.vue'),
     meta:{
       title:'System Admin',
+      roles:['ADMIN']
     },
     icon:'settings',
     visible:true,
@@ -85,11 +130,21 @@ const routes = [
     name:'catchAll',
     component: () => import('pages/ErrorNotFound.vue'),
     meta:{
-      title:'tests',
+      title:'Not Found',
     },
     icon:'error',
     visible:false,
   },
+  {
+    path: '/accessDenied',
+    name:'accessDenied',
+    component: () => import('pages/accessDenied.vue'),
+    meta:{
+      title:'Denied',
+    },
+    icon:'error',
+    visible:false,
+  },  
   {
     path: '/signIn',
     name:'signIn',

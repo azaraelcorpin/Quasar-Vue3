@@ -15,6 +15,12 @@
           <div v-if="$q.screen.width >= 550" >Strategic Performance Management System</div>
           <div v-else >SPMS</div>
         </q-toolbar-title>
+        <q-btn @click="asDev(true)">
+          asDev
+        </q-btn>
+        <q-btn @click="asDev(false)">
+          notDev
+        </q-btn>
         <q-btn   padding="0" round >
           <q-avatar size="40px" v-if="$route.name !== 'signIn'" >
                   <img :src="profilePicture()">
@@ -38,10 +44,11 @@
               </div>
             </div>
           </q-menu>
-        </q-btn>
+        </q-btn>        
       </q-toolbar>
     </q-header>
 
+    <!-- display App Version -->
     <q-footer reveal elevated style="background-color: #520608;">
         <q-toolbar class="justify-between">
           <div>MSU GenSan - ICTO</div>
@@ -76,7 +83,7 @@
             </q-item>
             
             <div v-for="item in routes" :key="item.path" link>
-              <div v-if="item.visible">
+              <div v-if="item.visible && checkRoles(item.meta.roles)">
                 <q-item v-if="!item.children" clickable v-ripple :to="item.path">
                   <q-item-section avatar>
                     <q-icon :name="item.icon" />
@@ -118,7 +125,7 @@
     </q-drawer>
 
     <q-page-container >
-      <div class="custom">SPMS</div>
+      <div class="custom"></div>
       <Transition 
         name="fade-transform"
         mode="out-in"
@@ -174,7 +181,7 @@ export default defineComponent({
       cookies,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
-      }
+      },
     }
   },
   methods:{
@@ -189,7 +196,36 @@ export default defineComponent({
         }
       }
       return "https://cdn.quasar.dev/img/avatar4.jpg";
-    },    
+    }, 
+    // Define the function to check user roles
+    checkRoles(roles) {
+      const requiredRoles = roles;
+      // Check if the route has required roles defined in its meta property
+      if (requiredRoles && requiredRoles.length > 0) {
+        // Check if the user has the required role
+        // next(false);
+        const userRoles = JSON.parse(localStorage.getItem('userRoles')); // Assuming you store user roles in localstorage
+        const hasRequiredRole =userRoles?requiredRoles.some(role => userRoles.includes(role)):null;
+        const ImDev = localStorage.getItem('ImDev');
+        if (hasRequiredRole || ImDev) {
+          // User has the required role, allow access to the route
+          return true;
+        } else {
+          // User does not have the required role, deny access or redirect to an access denied page
+          return false;  
+        }
+      } else {
+        // No specific roles required for this route, allow access
+        return true;
+      }
+    },
+    
+    asDev(param){
+      if(param)
+        localStorage.setItem("ImDev", "hashem")
+      else
+        localStorage.clear();
+    }   
 
   },
 })

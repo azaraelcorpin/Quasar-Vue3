@@ -1,6 +1,7 @@
 
 import { boot } from 'quasar/wrappers'
 import packageJson from '../../package.json'
+import {Quasar} from 'quasar' // Import Quasar as a Vue plugin
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
@@ -14,6 +15,7 @@ export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
 
   app.config.globalProperties.$version = packageJson.version
+  app.use(Quasar)
 //   app.config.globalProperties.$axios = axios
 //   // ^ ^ ^ this will allow you to use this.$axios (for Vue Options API form)
 //   //       so you won't necessarily have to import axios in each vue file

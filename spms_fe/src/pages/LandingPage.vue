@@ -62,7 +62,10 @@ export default{
                     throw new Error(response.error.message);
                   let sid=response.sessionId;
                   SID.sid=sid
-                  cookies.set('_UID_',JSON.stringify(SID),'1d');      
+                  cookies.set('_UID_',JSON.stringify(SID),'1d'); 
+                  // put in localStorage the userRoles from response ↓↓↓
+                  // localStorage.clear();
+                  // localStorage.setItem("userRoles",JSON.stringify('[DEV]'))     
                   router.push({ path: 'dashboard'})
                   loading.value=false;
                 } catch (Error) {

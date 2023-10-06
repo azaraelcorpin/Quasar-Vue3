@@ -18,6 +18,14 @@
           <q-dialog v-model="newUserDialog" persistent >
             <q-card  :style="{ width: $q.screen.xs ? '100%' : '50%' }" >   
               <q-form @submit="newUser" @reset="newUserReset">
+                <q-inner-loading :showing="loading"
+                label="Updating Record..."
+                label-class="text-black"
+                label-style="font-size: 1.1em"
+                color="black"
+                style="z-index: 1000;" 
+                >
+              </q-inner-loading>
                 <q-page-container style="padding:10px;" >                
                   <div class="text-h5" style="margin: 5px;">{{!NEW_USER.email_old?'New ':'Update '}} User</div> 
                   <q-input 
@@ -49,9 +57,12 @@
                     </template>
                   </q-input>  
 
+                  <!-- OFFICE_HEAD is excluded from selection, 
+                      OFFICE_HEAD is at employee.position table
+                  -->
                   <q-select 
                     outlined  
-                    :options="['Admin','PMT','HR','Office Staff']" 
+                     :options="['ADMIN','PMT','HR','OFFICE_STAFF']" 
                     label="User Type" 
                     class="q-pa-sm" 
                     color="primary" 
@@ -227,14 +238,16 @@
 
       async updateUser(){
         try {
-          this.loading = true;
+          
           dialog.confirm(this.$q,"Confirmation","Would you like to update this user?")
           .onOk(async() => {
+              this.loading = true;
               let response = await api.updateUser(this.NEW_USER);
               console.log('updateUser',response)      
               if(response.error){
                 dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
               }else{
+                this.loading = false; 
                 dialog.positive(this.$q,response.status,response.message).onOk(()=>{
                   // this.queryUserList();
                   this.testObj.email = this.NEW_USER.email
@@ -244,7 +257,8 @@
                   this.testObj.status = this.NEW_USER.status
                   this.newUserReset();
                 }) ;
-              }                                           
+              }     
+              this.loading = false;                                      
             })               
         } catch (error) {
           console.log('error',error)
@@ -267,6 +281,7 @@
                   this.queryUserList();
                 }) ;
               }
+              this.loading = false;
             })
           .onCancel(() => {
             return
