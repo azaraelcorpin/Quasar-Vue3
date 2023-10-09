@@ -39,23 +39,34 @@ export default {
     }
   },
 
-  validateResponse(response){
-    console.log('res',response)
-    if(response.status === 401){
-      
-      localStorage.removeItem('routeParams');
+  validateResponse(error){
+    let response = error.response
+    console.log('res',response.data.message)
+    if(response){
+      if(response.data && response.data.statusCode === '401'){    
+        localStorage.removeItem('routeParams');
+        Swal.fire({
+          title: 'Unauthorized',
+          text: response.data.message +' Please log in again',
+          icon: 'error',
+          confirmButtonText: 'OK',
+          allowOutsideClick:false,
+          timer:5000,
+        })
+        setTimeout(function() {
+          cookies.remove('_UID_');
+        }, 1000); // 5000 milliseconds = 5 seconds         
+      }
+    }else{
       Swal.fire({
-        title: 'Unauthorized',
-        text: 'Please log in again',
+        title: error.name,
+        text: error.message,
         icon: 'error',
         confirmButtonText: 'OK',
         allowOutsideClick:false,
-        timer:5000,
       })
-      setTimeout(function() {
-        cookies.remove('_UID_');
-      }, 1000); // 5000 milliseconds = 5 seconds         
     }
+    
   },
 
 
@@ -93,8 +104,8 @@ export default {
           return {error:response}
         }
       } catch (error) {
-        console.log(error.response);
-        return { error: error.response }
+        console.log('error',error.response.data);
+        return { error:error.response }
       }
     },  
 
@@ -106,8 +117,55 @@ export default {
         email:param.email,
         userName:param.userName,
         userType:param.userType,
-        officeId:param.officeId.id,
+        officeId:param.userType === 'OFFICE_STAFF'? param.officeId.id:null,
         privileges:param.privileges,
+       }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('newUser Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },  
+
+    async updateUser(param) {
+      var url = api_url+'/user/update'
+      const config = await this.getAuthorization();
+      const body = {
+        email:param.email,
+        userName:param.userName,
+        userType:param.userType,
+        officeId:param.userType === 'OFFICE_STAFF'? param.officeId.id:null,
+        privileges:param.privileges,
+        status:param.status,
+        email_old:param.email_old,
+       }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('newUser Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },      
+
+       ///// Delete User
+    async deleteUser(param) {
+      var url = api_url+'/user/delete'
+      const config = await this.getAuthorization();
+      const body = {
+        email:param.email,
        }
       try {      
         const response = await axios.post(url, body, config);
@@ -138,8 +196,8 @@ export default {
         }
       } catch (error) {
         console.log(error.response);
-        this.validateResponse(error.response)
-        return { error: error.response }
+        this.validateResponse(error)
+        return { error: error.response }??error
       }
     },    
 
@@ -157,9 +215,9 @@ export default {
           return {error:response}
         }
       } catch (error) {
-        console.log(error.response);
-        this.validateResponse(error.response)
-        return { error: error.response }
+        console.log(error);
+        this.validateResponse(error)
+        return { error: error.response }??error
       }
     },     
 
