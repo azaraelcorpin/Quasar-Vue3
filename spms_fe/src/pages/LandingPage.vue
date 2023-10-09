@@ -57,20 +57,26 @@ export default{
               }
               else{
                 try {                  
-                  let response = await api.generateSessionId(SID);                  
+                  let response = await api.generateSessionId(SID);                 
                   if(response.error)
-                    throw new Error(response.error.message);
-                  let sid=response.sessionId;
-                  SID.sid=sid
-                  cookies.set('_UID_',JSON.stringify(SID),'1d'); 
-                  // put in localStorage the userRoles from response ↓↓↓
-                  // localStorage.clear();
-                  // localStorage.setItem("userRoles",JSON.stringify('[DEV]'))     
-                  router.push({ path: 'dashboard'})
+                    throw new Error(response.error.data.message);
+                  if(response.status === 'OK'){
+                      let sid=response.session.sessionId;
+                      SID.sid=sid
+                      cookies.set('_UID_',JSON.stringify(SID),'1d'); 
+                      // put in localStorage the userRoles from response ↓↓↓
+                      // localStorage.clear();
+                      // localStorage.setItem("userRoles",JSON.stringify('[DEV]'))    
+
+                      localStorage.clear();
+                      localStorage.setItem("userRoles",JSON.stringify(response.session.ROLES))    
+                      localStorage.setItem("office_id",JSON.stringify(response.session.office_id))                
+                  }
+                      router.push({ path: 'dashboard'})
+                      loading.value=false;
+                } catch (error) { 
                   loading.value=false;
-                } catch (Error) {
-                  loading.value=false;
-                  myDialog.negative($q,'Error',Error.message)
+                  myDialog.negative($q,'Error',error.message)
 
                 }
               }

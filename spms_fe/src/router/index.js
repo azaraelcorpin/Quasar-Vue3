@@ -44,7 +44,7 @@ function checkRoles(to, from, next) {
           if(prevRouteRole)
             next(false);
           else
-            next({name:'home'})
+            next({name:'dashboard'})
         }) ;      
     }
   } else {

@@ -41,13 +41,13 @@ export default {
 
   validateResponse(error){
     let response = error.response
-    console.log('res',response)
+    console.log('res',response.data.message)
     if(response){
-      if(response & response.status === 401){      
+      if(response.data && response.data.statusCode === '401'){    
         localStorage.removeItem('routeParams');
         Swal.fire({
           title: 'Unauthorized',
-          text: 'Please log in again',
+          text: response.data.message +' Please log in again',
           icon: 'error',
           confirmButtonText: 'OK',
           allowOutsideClick:false,
@@ -104,8 +104,8 @@ export default {
           return {error:response}
         }
       } catch (error) {
-        console.log('error',error.message);
-        return { error }
+        console.log('error',error.response.data);
+        return { error:error.response }
       }
     },  
 
@@ -117,7 +117,7 @@ export default {
         email:param.email,
         userName:param.userName,
         userType:param.userType,
-        officeId:param.officeId.id,
+        officeId:param.userType === 'OFFICE_STAFF'? param.officeId.id:null,
         privileges:param.privileges,
        }
       try {      
@@ -141,7 +141,7 @@ export default {
         email:param.email,
         userName:param.userName,
         userType:param.userType,
-        officeId:param.officeId.id,
+        officeId:param.userType === 'OFFICE_STAFF'? param.officeId.id:null,
         privileges:param.privileges,
         status:param.status,
         email_old:param.email_old,

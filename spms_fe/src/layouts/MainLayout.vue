@@ -188,6 +188,7 @@ export default defineComponent({
     signOut(){
       this.cookies.remove('_UID_');
       this.router.push({name:'signIn'});
+      localStorage.clear();
     },
     profilePicture(){
       if(this.cookies.isKey('_UID_')){
@@ -224,7 +225,7 @@ export default defineComponent({
       if(param)
         localStorage.setItem("ImDev", "hashem")
       else
-        localStorage.clear();
+        localStorage.removeItem("ImDev");
     }   
 
   },

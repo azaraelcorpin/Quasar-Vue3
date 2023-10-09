@@ -75,6 +75,7 @@
                   </q-select>
 
                   <q-select 
+                    v-if="NEW_USER.userType === 'OFFICE_STAFF'"
                     outlined  
                     :options="offices" 
                     option-label="code"
@@ -207,7 +208,7 @@
         try {
           this.loading = true;
           let response = await api.getAllUser();
-          console.log('getAllUser', response.message)
+          console.log('getAllUser', response)
           this.userlist = response.USERS;
         } catch (error) {
           console.log('error',error)
@@ -252,7 +253,7 @@
                   // this.queryUserList();
                   this.testObj.email = this.NEW_USER.email
                   this.testObj.username = this.NEW_USER.userName
-                  this.testObj.office = this.NEW_USER.officeId.code
+                  this.testObj.office = this.NEW_USER.userType === 'OFFICE_STAFF'?this.NEW_USER.officeId.code:null
                   this.testObj.user_type = this.NEW_USER.userType
                   this.testObj.status = this.NEW_USER.status
                   this.newUserReset();
