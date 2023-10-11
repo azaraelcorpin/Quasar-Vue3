@@ -74,7 +74,7 @@ const routes = [
     children:[
       {
         path: '/pcr_sched',
-        component: () => import('pages/sysAdmin/UserMgt.vue'),
+        component: () => import('pages/PMT/ScheduleMgt.vue'),
         meta:{
           title:'PCR Schedule',
         },
@@ -101,6 +101,36 @@ const routes = [
       },
     ],
   },
+  {
+    path: '/HR',
+    component: () => import('pages/sysAdmin/SysAdmin.vue'),
+    meta:{
+      title:'Human Resource',
+      roles:['HR']
+    },
+    icon:'groups',
+    visible:true,
+    children:[
+      {
+        path: '/offices',
+        component: () => import('pages/HR/Offices.vue'),
+        meta:{
+          title:'Office',
+        },
+        icon:'holiday_village',
+        visible:true,
+      },
+      {
+        path: '/employees',
+        component: () => import('pages/sysAdmin/UserMgt.vue'),
+        meta:{
+          title:'Employees',
+        },
+        icon:'supervisor_account',
+        visible:true,
+      },
+    ],
+  },  
   {
     path: '/sysadm',
     component: () => import('pages/sysAdmin/SysAdmin.vue'),
