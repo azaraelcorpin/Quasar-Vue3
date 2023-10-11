@@ -13,11 +13,11 @@
       <q-card class="pa-1">      
 
         <q-card-section class="container--fluid" style="height: 89vh;">
-          <div class="text-h4">User Management </div>
-          <!-- new User dialog -->
-          <q-dialog v-model="newUserDialog" persistent >
+          <div class="text-h4">PCR Schedule Management </div>
+          <!-- new Schedule dialog -->
+          <q-dialog v-model="newScheduleDialog" persistent >
             <q-card  :style="{ width: $q.screen.xs ? '100%' : '50%' }" >   
-              <q-form @submit="newUser" @reset="newUserReset">
+              <q-form @submit="newSchedule" @reset="newScheduleReset">
                 <q-inner-loading :showing="loading"
                 label="Updating Record..."
                 label-class="text-black"
@@ -27,75 +27,43 @@
                 >
               </q-inner-loading>
                 <q-page-container style="padding:10px;" >                
-                  <div class="text-h5" style="margin: 5px;">{{!NEW_USER.email_old?'New ':'Update '}} User</div> 
-                  <q-input 
-                    required 
-                    label="Email" 
-                    dense 
-                    outlined 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_USER.email"
-                    :rules="[rules.properEmail,rules.requiredField]"
-                    >
-                    <template v-slot:prepend>
-                      <q-icon name="email" />
+                  <div class="text-h5" style="margin: 5px;">{{!NEW_SCHED.id?'New ':'Update '}} Schedule</div> 
+
+                  <q-input filled v-model="NEW_SCHED.dateStart" mask="date" :rules="['date']" readonly label="Date Start">
+                    <template v-slot:append>
+                      <q-icon name="event" class="cursor-pointer">
+                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                          <q-date v-model="NEW_SCHED.dateStart" minimal>
+                            <div class="row items-center justify-end">
+                              <q-btn v-close-popup label="Close" color="primary" flat />
+                            </div>
+                          </q-date>
+                        </q-popup-proxy>
+                      </q-icon>
                     </template>
-                  </q-input>   
+                  </q-input>
 
-                  <q-input 
-                    label="Fullname" 
-                    dense 
-                    outlined 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_USER.userName"
-                    :rules="[rules.requiredField,rules.notEmpty,rules.noSpaceStart]"
-                    >
-                    <template v-slot:prepend>
-                      <q-icon name="person_outline" />
+                  <q-input filled v-model="NEW_SCHED.dateEnd" mask="date" :rules="['date']" readonly label="Date End">
+                    <template v-slot:append>
+                      <q-icon name="event" class="cursor-pointer">
+                        <q-popup-proxy cover transition-show="scale" transition-hide="scale">
+                          <q-date v-model="NEW_SCHED.dateEnd" minimal>
+                            <div class="row items-center justify-end">
+                              <q-btn v-close-popup label="Close" color="primary" flat />
+                            </div>
+                          </q-date>
+                        </q-popup-proxy>
+                      </q-icon>
                     </template>
-                  </q-input>  
+                  </q-input>
 
-                  <!-- OFFICE_HEAD is excluded from selection, 
-                      OFFICE_HEAD is at employee.position table
-                  -->
-                  <q-select 
-                    outlined  
-                     :options="['ADMIN','PMT','HR','OFFICE_STAFF']" 
-                    label="User Type" 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_USER.userType"
-                    :rules="[rules.requiredField]"
-                    >
-                    <template v-slot:prepend>
-                      <q-icon name="assignment_ind" />
-                    </template>
-                  </q-select>
 
-                  <q-select 
-                    v-if="NEW_USER.userType === 'OFFICE_STAFF'"
-                    outlined  
-                    :options="offices" 
-                    option-label="code"
-                    label="Office" 
-                    class="q-pa-sm" 
-                    color="primary"  
-                    v-model="NEW_USER.officeId"
-                    :rules="[rules.requiredField]"
-                    >
-                    <template v-slot:prepend>
-                      <q-icon name="assignment" />
-                    </template>                
-                  </q-select>
-
-                  <div class="q-gutter-sm" v-if="NEW_USER.email_old">
-                    <q-radio v-model="NEW_USER.status" val="Active" label="Active" />
-                    <q-radio v-model="NEW_USER.status" val="Inactive" label="Inactive" />
+                  <div class="q-gutter-sm" v-if="NEW_SCHED.id">
+                    <q-radio v-model="NEW_SCHED.status" val="Active" label="Active" />
+                    <q-radio v-model="NEW_SCHED.status" val="Inactive" label="Inactive" />
                   </div>
                   <div style="display: flex; justify-content: flex-end;">
-                    <q-btn class="q-ma-md" color="primary" v-if="NEW_USER.email_old" @click="updateUser">Update</q-btn>
+                    <q-btn class="q-ma-md" color="primary" v-if="NEW_SCHED.id" @click="updateSchedule">Update</q-btn>
                     <q-btn class="q-ma-md" color="primary" v-else type="submit">Save</q-btn>
                     <q-btn class="q-ma-md" type="reset">Cancel</q-btn>
                   </div>
@@ -105,11 +73,11 @@
             </q-card>
           </q-dialog>
           <!-- end dialog -->
-          <!-- user list table  -->
+          <!-- Schedule list table  -->
             <q-table
               class="my-sticky-header-table"
-              :grid="$q.screen.xs"
-              :rows="userlist"
+              :grid="false"
+              :rows="Schedulelist"
               :columns="header"
               row-key="email"
               :rows-per-page-options="[ 10, 1, 15, 20, 25, 50, 0 ]"
@@ -120,7 +88,7 @@
               <template v-slot:body-cell="props">
                 <q-td
                   :props="props"
-                  :class="(props.row.status =='Inactive')?'text-red':'text-black'"
+                  :class="(props.row.status !=='Inactive')?'bg-green text-black':'text-black'"
                 >
                   {{props.value}}
                 </q-td>
@@ -128,13 +96,13 @@
 
               <template v-slot:body-cell-action="props">
                 <q-td :props="props" 
-                  :class="(props.row.status =='Inactive')?'text-red':'text-black'">
-                  <q-btn color="positive" icon="edit" round flat @click="showUpdateUserDialog(props.row)"></q-btn>
-                  <q-btn color="negative" icon="delete" round flat @click="deleteUser(props.row)"></q-btn>
+                  :class="(props.row.status !=='Inactive')?'bg-green text-black':'text-black'">
+                  <q-btn :color="(props.row.status !=='Inactive')?'warning':'positive'" icon="edit" round flat @click="showUpdateScheduleDialog(props.row)"></q-btn>
+                  <q-btn color="negative" icon="delete" round flat @click="deleteSchedule(props.row)"></q-btn>
                 </q-td>
               </template>   
               <template v-slot:top>
-                <q-btn push color="primary" @click=" newUserReset(), newUserDialog = !newUserDialog">New User</q-btn>
+                <q-btn push color="primary" @click=" newScheduleReset(), newScheduleDialog = !newScheduleDialog">New Schedule</q-btn>
                   <q-space />
                   <q-input dense debounce="300" color="primary" v-model="filter" placeholder="Search">
                     <template v-slot:append>
@@ -161,8 +129,8 @@
                         >{{col.value}}
                         </q-chip>
                         <div v-else-if="col.name === 'action'"  class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
-                          <q-btn color="positive" icon="edit" round flat @click="showUpdateUserDialog(props.row)"></q-btn>
-                          <q-btn color="negative" icon="delete" round flat @click="deleteUser(props.row)"></q-btn>
+                          <q-btn color="positive" icon="edit" round flat @click="showUpdateScheduleDialog(props.row)"></q-btn>
+                          <q-btn color="negative" icon="delete" round flat @click="deleteSchedule(props.row)"></q-btn>
                         </div>
                         <q-item-label v-else caption :class="col.classes ? col.classes : ''">{{ col.value }}</q-item-label>
                       </q-item-section>
@@ -187,7 +155,7 @@
   import { useQuasar } from 'quasar'
   
   export default defineComponent({
-    name: 'UserMgt',
+    name: 'ScheduleMgt',
     setup(){
       const $q = useQuasar();
       return{
@@ -201,42 +169,30 @@
 
       },
 
-      async queryOffices(){
+      async queryScheduleList(){
         try {
           this.loading = true;
-          let response = await api.getAllOffice();
-          console.log('getOffices', response.message)
-          this.offices = response.OFFICES;
+          let response = await api.getAllPcrSchedule();
+          console.log('getAllSchedule', response)
+          this.Schedulelist = response.SCHEDULES;
         } catch (error) {
           console.log('error',error)
         }
         this.loading = false;
       },
 
-      async queryUserList(){
+      async newSchedule(){
         try {
           this.loading = true;
-          let response = await api.getAllUser();
-          console.log('getAllUser', response)
-          this.userlist = response.USERS;
-        } catch (error) {
-          console.log('error',error)
-        }
-        this.loading = false;
-      },
-
-      async newUser(){
-        try {
-          this.loading = true;
-          console.log(this.NEW_USER);
-          let response = await api.newUser(this.NEW_USER);
-          console.log('newUser',response)          
+          console.log(this.NEW_SCHED);
+          let response = await api.newSched(this.NEW_SCHED);
+          console.log('newSchedule',response)          
           if(response.error){
             dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
           }else{
             dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-              this.newUserReset();
-              this.queryUserList();
+              this.newScheduleReset();
+              this.queryScheduleList();
             }) ;
           }
           
@@ -246,26 +202,25 @@
         this.loading = false;
       },
 
-      async updateUser(){
+      async updateSchedule(){
         try {
           
-          dialog.confirm(this.$q,"Confirmation","Would you like to update this user?")
+          dialog.confirm(this.$q,"Confirmation","Would you like to update this Schedule?")
           .onOk(async() => {
               this.loading = true;
-              let response = await api.updateUser(this.NEW_USER);
-              console.log('updateUser',response)      
+              let response = await api.updateSched(this.NEW_SCHED);
+              console.log('updateSchedule',response)      
               if(response.error){
                 dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
               }else{
                 this.loading = false; 
                 dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-                  // this.queryUserList();
-                  this.testObj.email = this.NEW_USER.email
-                  this.testObj.username = this.NEW_USER.userName
-                  this.testObj.office = this.NEW_USER.userType === 'OFFICE_STAFF'?this.NEW_USER.officeId.code:null
-                  this.testObj.user_type = this.NEW_USER.userType
-                  this.testObj.status = this.NEW_USER.status
-                  this.newUserReset();
+                  // this.queryScheduleList();
+                  this.testObj.id = this.NEW_SCHED.id
+                  this.testObj.dateStart = this.NEW_SCHED.dateStart
+                  this.testObj.dateEnd = this.NEW_SCHED.dateEnd
+                  this.testObj.status = this.NEW_SCHED.status
+                  this.newScheduleReset();
                 }) ;
               }     
               this.loading = false;                                      
@@ -276,19 +231,19 @@
         this.loading = false;
       },      
 
-      async deleteUser(param){
+      async deleteSchedule(param){
         try {
 
-          dialog.confirm(this.$q,"Confirmation","Would you like to delete "+param.email+"?")
+          dialog.confirm(this.$q,"Confirmation","Would you like to delete the schedule ID No. "+param.id+"?")
           .onOk(async() => {
               this.loading = true;
-              let response = await api.deleteUser(param);
-              console.log('deleteUser',response)          
+              let response = await api.deleteSched(param);
+              console.log('deleteSchedule',response)          
               if(response.error){
                 dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
               }else{
                 dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-                  this.queryUserList();
+                  this.queryScheduleList();
                 }) ;
               }
               this.loading = false;
@@ -303,36 +258,45 @@
         this.loading = false;
       },
 
-      showUpdateUserDialog(row){
-        this.testObj = row;
+      showUpdateScheduleDialog(row){
+        this.testObj = row;        
         let tmp = {...row};
-        this.NEW_USER.email = tmp.email;
-        this.NEW_USER.userName = tmp.username;
-        this.NEW_USER.userType = tmp.user_type;
-        this.NEW_USER.officeId = this.offices.find((office)=> office.id === tmp.office_id);
-        this.NEW_USER.email_old = tmp.email;
-        this.NEW_USER.status = tmp.status;
-        this.newUserDialog = true;
+        console.log('start', tmp)
+        this.NEW_SCHED.id = tmp.id;
+        this.NEW_SCHED.dateStart = this.formatDateToDateSelect( tmp.dateStart);
+        this.NEW_SCHED.dateEnd = this.formatDateToDateSelect(tmp.dateEnd);
+        this.NEW_SCHED.status = tmp.status;
+        this.newScheduleDialog = true;
       },
 
-      newUserReset(){
-        this.NEW_USER={
-              email:null,
-              userName:null,
-              userType:null,
-              officeId:null,
-              email_old:null,
+      newScheduleReset(){
+        this.NEW_SCHED={
+              id:null,
+              dateStart:null,
+              dateEnd:null,
               status:null,
             }
-            this.newUserDialog = false;
-      }
+            this.newScheduleDialog = false;
+      },
+      formatDate(dateString) {
+        const dateObject = new Date(dateString);
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return dateObject.toLocaleDateString(undefined, options);
+      },
+      formatDateToDateSelect(DateVariable){
+        const formattedDate = new Date(DateVariable)
+          .toISOString()
+          .slice(0, 10)
+          .replace(/-/g, "/");
+          return formattedDate
+      },
     },
     data(){
       return {
         testObj:{},
         filter:"",
         loading:false,
-        newUserDialog:false,
+        newScheduleDialog:false,
         rules: {
                 noSpace: v => (!v?.includes(' ')) || "No space allowed.",
                 notEmpty:(v) => (v && v.replaceAll(' ','').length > 0) ||  "Empty Value.",
@@ -348,42 +312,34 @@
                 // float: (v) => ((!isNaN(this.StringToNumber(v)) && this.StringToNumber(v).indexOf('.') != -1) || (!isNaN(this.StringToNumber(v)) && /^[0-9]*$/.test(this.StringToNumber(v)))) || "Must be a number"
                 ///^(09|\+639)\d{9}$/ <- if needed full philippine mobile number 
             },
-            NEW_USER:{
-              email:null,
-              userName:null,
-              userType:null,
-              officeId:null,
-              email_old:null,
+            NEW_SCHED:{
+              id:null,
+              dateStart:null,
+              dateEnd:null,
               status:null,
             },
-        offices:[],
         header : [
             {
-              name: 'email',
-              label: 'Email',
+              name: 'id',
+              label: 'ID',
               align: 'left',
-              field: 'email',
+              field: 'id',
               sortable: true
             },
             {
-              name: 'userName',
-              label: 'Fullname',
+              name: 'dateStart',
+              label: 'Start',
               align: 'left',
-              field: 'username',
+              field: 'dateStart',
+              format:(val,row)=>this.formatDate(val),
               sortable: true
             },
             {
-              name: 'userType',
-              label: 'User Type',
+              name: 'dateEnd',
+              label: 'End',
               align: 'left',
-              field: 'user_type',
-              sortable: true
-            },
-            {
-              name: 'office',
-              label: 'Office',
-              align: 'left',
-              field: 'office',
+              field: 'dateEnd',
+              format:(val,row)=>this.formatDate(val),
               sortable: true
             },
             {
@@ -399,12 +355,11 @@
               align: 'center',
             },
           ],
-        userlist:[],
+          Schedulelist:[],
       };
     },
     mounted(){
-      this.queryOffices();
-      this.queryUserList();
+      this.queryScheduleList();
     }
   })
   </script>

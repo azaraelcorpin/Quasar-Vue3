@@ -151,7 +151,7 @@ export default {
         if (response && response.data && response.status == 200) {
           return response.data;
         } else{
-          console.log('newUser Error');
+          console.log('Update User Error');
           return {error:response}
         }
       } catch (error) {
@@ -219,6 +219,118 @@ export default {
         this.validateResponse(error)
         return { error: error.response }??error
       }
-    },     
+    },    
+    
+    ///// getAllPcrSchedule 
+    async getAllPcrSchedule() {
+      var url = api_url+'/pcr_schedule/all'
+      const config = await this.getAuthorization();
+      const body = { }
+      try {      
+        const response = await axios.post(url, body, config);      
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log(response);
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error);
+        this.validateResponse(error)
+        return { error: error.response }??error
+      }
+    },    
+
+    ///// new PCR SCHED
+    async newSched(param) {
+      var url = api_url+'/pcr_schedule/new'
+      const config = await this.getAuthorization();
+      const body = {
+        dateStart:this.dateEN_US(param.dateStart),
+        dateEnd:this.dateEN_US(param.dateEnd),
+        }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('newScedule Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },  
+    /**
+     * @param {String} pdate
+     * @returns String Date with timezone en-US
+     */
+    dateEN_US(pdate){
+      const date = new Date(pdate); // Replace this with your desired date
+
+        const options = {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          fractionalSecondDigits: 3, // Milliseconds with 3 digits
+          timeZoneName: 'short', // Add 'Z' for UTC
+        };
+
+        const formattedDate = new Intl.DateTimeFormat('en-US', options).formatToParts(date);
+
+        // Create the desired format 'yyyy-MM-dd'T'HH:mm:ss.SSS'Z''
+        return `${formattedDate[4].value}-${formattedDate[0].value}-${formattedDate[2].value}T${formattedDate[6].value}:${formattedDate[8].value}:${formattedDate[10].value}.${formattedDate[12].value}Z`;
+    },
+
+    ///// update PCR SCHED
+    async updateSched(param) {
+      var url = api_url+'/pcr_schedule/update'
+      console.log(this.dateEN_US(new Date()))
+      const config = await this.getAuthorization();
+      const body = {
+        dateStart:this.dateEN_US(param.dateStart),
+        dateEnd:this.dateEN_US(param.dateEnd),
+        id:param.id,
+        status:param.status,
+        }
+        console.log('@Body',param)
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('Update Schedule Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },      
+
+    ///// Delete Sched
+    async deleteSched(param) {
+      var url = api_url+'/pcr_schedule/delete'
+      const config = await this.getAuthorization();
+      const body = {
+        id:param.id,
+        }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('delete Sched Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },      
 
 }

@@ -12,8 +12,10 @@
         />
 
         <q-toolbar-title>
-          <div v-if="$q.screen.width >= 550" >Strategic Performance Management System</div>
-          <div v-else >SPMS</div>
+          <div :style="{marginLeft:miniState?'0':'150px'}">
+            <div v-if="$q.screen.width >= 550" >Strategic Performance Management System</div>
+            <div v-else >SPMS</div>
+          </div>
         </q-toolbar-title>
         <q-btn @click="asDev(true)">
           asDev
@@ -253,8 +255,8 @@ export default defineComponent({
   background-color: rgba(255, 0, 0, 0.5); /* Red color with 50% opacity */
 
   /* Other styles */
-  width: 200px; /* Set the width as needed */
-  height: 200px; /* Set the height as needed */
+  width: 400px; /* Set the width as needed */
+  height: 400px; /* Set the height as needed */
   text-align: center; /* Optional: Center text horizontally */
 
   /* Z-index */
