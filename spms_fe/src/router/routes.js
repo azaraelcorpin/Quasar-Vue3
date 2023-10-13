@@ -102,36 +102,6 @@ const routes = [
     ],
   },
   {
-    path: '/HR',
-    component: () => import('pages/sysAdmin/SysAdmin.vue'),
-    meta:{
-      title:'Human Resource',
-      roles:['HR']
-    },
-    icon:'groups',
-    visible:true,
-    children:[
-      {
-        path: '/offices',
-        component: () => import('pages/HR/OfficesMgt.vue'),
-        meta:{
-          title:'Office',
-        },
-        icon:'holiday_village',
-        visible:true,
-      },
-      {
-        path: '/employees',
-        component: () => import('pages/sysAdmin/UserMgt.vue'),
-        meta:{
-          title:'Employees',
-        },
-        icon:'supervisor_account',
-        visible:true,
-      },
-    ],
-  },  
-  {
     path: '/sysadm',
     component: () => import('pages/sysAdmin/SysAdmin.vue'),
     meta:{
