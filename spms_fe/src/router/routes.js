@@ -113,7 +113,7 @@ const routes = [
     children:[
       {
         path: '/offices',
-        component: () => import('pages/HR/Offices.vue'),
+        component: () => import('pages/HR/OfficesMgt.vue'),
         meta:{
           title:'Office',
         },

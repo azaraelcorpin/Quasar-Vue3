@@ -37,7 +37,7 @@
                     class="q-pa-sm" 
                     color="primary" 
                     v-model="NEW_OFFICE.code"
-                    :rules="[rules.requiredField,rules.noSpace]"
+                    :rules="[rules.requiredField,rules.noSpaceStart]"
                     >
                   </q-input> 
 
@@ -48,17 +48,53 @@
                     outlined 
                     class="q-pa-sm" 
                     color="primary" 
-                    v-model="NEW_OFFICE.Description"
-                    :rules="[rules.requiredField,rules.noSpace]"
+                    v-model="NEW_OFFICE.description"
+                    :rules="[rules.requiredField,rules.noSpaceStart]"
                     >
                   </q-input>                   
+                  <q-select 
+                    outlined  
+                     :options="[{val:0,desc:'Office'},{val:1,desc:'Sector'}]" 
+                     option-label="desc"
+                     option-value="val"
+                     @popup-hide="()=>{
+                      if(NEW_OFFICE.is_sector.val===1){
+                        NEW_OFFICE.hasTopOffice = true;
+                        disableHasTopOfficeCheckBox = true;
+                      }else{
+                        disableHasTopOfficeCheckBox = false;
+                      }
+                     }"
+                    label="Office Type" 
+                    class="q-pa-sm" 
+                    color="primary" 
+                    v-model="NEW_OFFICE.is_sector"
+                    :rules="[rules.requiredField]"
+                    >
+                  </q-select>
+                  <q-checkbox
+                    right-label
+                    v-model="NEW_OFFICE.hasTopOffice"
+                    label="Has Top Office"
+                    checked-icon="task_alt"
+                    unchecked-icon="highlight_off"   
+                    :disable="disableHasTopOfficeCheckBox" 
+                  />
+                  <q-select v-if="NEW_OFFICE.hasTopOffice"
+                    outlined  
+                     :options="Officelist.filter((office)=> office.is_sector === 0  && office.id !== NEW_OFFICE.id)" 
+                     option-label="code"
+                     option-value="id"
+                    label="Top Office" 
+                    class="q-pa-sm" 
+                    color="primary" 
+                    v-model="NEW_OFFICE.topOfficeId"
+                    :rules="NEW_OFFICE.is_sector.val===1 || NEW_OFFICE.hasTopOffice?[rules.requiredField]:[]"
+                    >
+                  </q-select>
 
-                  <div class="q-gutter-sm" v-if="NEW_OFFICE.id">
-                    <q-radio v-model="NEW_OFFICE.status" val="Active" label="Active" />
-                    <q-radio v-model="NEW_OFFICE.status" val="Inactive" label="Inactive" />
-                  </div>
                   <div style="display: flex; justify-content: flex-end;">
-                    <q-btn class="q-ma-md" color="primary" v-if="NEW_OFFICE.id" @click="updateOffice">Update</q-btn>
+                    <q-btn class="q-ma-md" color="primary" v-if="NEW_OFFICE.id" type="submit">Update</q-btn>
                     <q-btn class="q-ma-md" color="primary" v-else type="submit">Save</q-btn>
                     <q-btn class="q-ma-md" type="reset">Cancel</q-btn>
                   </div>
@@ -159,7 +195,7 @@
           this.loading = true;
           let response = await api.getAllOffice();
           console.log('getAllOffice', response)
-          this.Officelist = response.OFFICES;
+          this.Officelist = response.OFFICES;          
         } catch (error) {
           console.log('error',error)
         }
@@ -167,10 +203,14 @@
       },
 
       async newOffice(){
+        console.log('NewOffice',this.NEW_OFFICE)
+        if(this.NEW_OFFICE.id){
+          this.updateOffice()
+        }else{
         try {
           this.loading = true;
           console.log(this.NEW_OFFICE);
-          let response = await api.newSched(this.NEW_OFFICE);
+          let response = await api.newOffice(this.NEW_OFFICE);
           console.log('newOffice',response)          
           if(response.error){
             dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
@@ -181,30 +221,27 @@
             }) ;
           }
           
-        } catch (error) {
-          console.log('error',error)
+          } catch (error) {
+            console.log('error',error)
+          }
+          this.loading = false;
         }
-        this.loading = false;
       },
 
       async updateOffice(){
         try {
-          
+          console.log(this.NEW_OFFICE)
           dialog.confirm(this.$q,"Confirmation","Would you like to update this Office?")
           .onOk(async() => {
               this.loading = true;
-              let response = await api.updateSched(this.NEW_OFFICE);
+              let response = await api.updateOffice(this.NEW_OFFICE);
               console.log('updateOffice',response)      
               if(response.error){
                 dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
               }else{
                 this.loading = false; 
                 dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-                  // this.queryOfficeList();
-                  this.testObj.id = this.NEW_OFFICE.id
-                  this.testObj.dateStart = this.NEW_OFFICE.dateStart
-                  this.testObj.dateEnd = this.NEW_OFFICE.dateEnd
-                  this.testObj.status = this.NEW_OFFICE.status
+                  this.queryOfficeList();
                   this.newOfficeReset();
                 }) ;
               }     
@@ -222,7 +259,7 @@
           dialog.confirm(this.$q,"Confirmation","Would you like to delete the Office ID No. "+param.id+"?")
           .onOk(async() => {
               this.loading = true;
-              let response = await api.deleteSched(param);
+              let response = await api.deleteOffice(param);
               console.log('deleteOffice',response)          
               if(response.error){
                 dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
@@ -248,18 +285,22 @@
         let tmp = {...row};
         console.log('start', tmp)
         this.NEW_OFFICE.id = tmp.id;
-        this.NEW_OFFICE.dateStart = this.formatDateToDateSelect( tmp.dateStart);
-        this.NEW_OFFICE.dateEnd = this.formatDateToDateSelect(tmp.dateEnd);
-        this.NEW_OFFICE.status = tmp.status;
+        this.NEW_OFFICE.code = tmp.code;
+        this.NEW_OFFICE.description = tmp.Description;
+        this.NEW_OFFICE.is_sector = tmp.is_sector?{val:1,desc:'Sector'}:{val:0,desc:'Office'};
+        this.NEW_OFFICE.topOfficeId = this.Officelist.find((office)=> office.id === tmp.top_office);
+        this.NEW_OFFICE.hasTopOffice = tmp.top_office_code?true:false;
         this.newOfficeDialog = true;
       },
 
       newOfficeReset(){
         this.NEW_OFFICE={
               id:null,
-              dateStart:null,
-              dateEnd:null,
-              status:null,
+              code:null,
+              description:null,
+              is_sector:{val:0,desc:'Office'},
+              topOfficeId:null,
+              hasTopOffice:false,
             }
             this.newOfficeDialog = false;
       },
@@ -297,12 +338,14 @@
                 // float: (v) => ((!isNaN(this.StringToNumber(v)) && this.StringToNumber(v).indexOf('.') != -1) || (!isNaN(this.StringToNumber(v)) && /^[0-9]*$/.test(this.StringToNumber(v)))) || "Must be a number"
                 ///^(09|\+639)\d{9}$/ <- if needed full philippine mobile number 
             },
-            NEW_OFFICE:{
-              id:null,
-              dateStart:null,
-              dateEnd:null,
-              status:null,
-            },
+        NEW_OFFICE:{
+          id:null,
+          code:null,
+          description:null,
+          is_sector:{val:0,desc:'Office'},
+          topOfficeId:null,
+          hasTopOffice:false,
+        },
         header : [
             {
               name: 'id',
@@ -347,11 +390,24 @@
             },
           ],
           Officelist:[],
+          disableHasTopOfficeCheckBox:false,
       };
     },
     mounted(){
       this.queryOfficeList();
-    }
+    },
+    // watch:{
+    //   NEW_OFFICE_is_sector(newVal,oldVal){
+    //     if(this.NEW_OFFICE.is_sector){
+    //       if(this.NEW_OFFICE.is_sector.val === 1){
+    //         this.NEW_OFFICE.hasTopOffice = true;
+    //         this.disableHasTopOfficeCheckBox = true;
+    //       }else{
+    //         this.disableHasTopOfficeCheckBox = true;
+    //       }
+    //     }
+    //   }
+    // }
   })
   </script>
   <style>

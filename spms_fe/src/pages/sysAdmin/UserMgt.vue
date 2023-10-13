@@ -95,7 +95,7 @@
                     <q-radio v-model="NEW_USER.status" val="Inactive" label="Inactive" />
                   </div>
                   <div style="display: flex; justify-content: flex-end;">
-                    <q-btn class="q-ma-md" color="primary" v-if="NEW_USER.email_old" @click="updateUser">Update</q-btn>
+                    <q-btn class="q-ma-md" color="primary" v-if="NEW_USER.email_old" type="submit">Update</q-btn>
                     <q-btn class="q-ma-md" color="primary" v-else type="submit">Save</q-btn>
                     <q-btn class="q-ma-md" type="reset">Cancel</q-btn>
                   </div>
@@ -226,24 +226,28 @@
       },
 
       async newUser(){
-        try {
-          this.loading = true;
-          console.log(this.NEW_USER);
-          let response = await api.newUser(this.NEW_USER);
-          console.log('newUser',response)          
-          if(response.error){
-            dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
-          }else{
-            dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-              this.newUserReset();
-              this.queryUserList();
-            }) ;
+        if(this.NEW_USER.email_old){
+          this.updateUser()
+        }else{
+          try {
+            this.loading = true;
+            console.log(this.NEW_USER);
+            let response = await api.newUser(this.NEW_USER);
+            console.log('newUser',response)          
+            if(response.error){
+              dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
+            }else{
+              dialog.positive(this.$q,response.status,response.message).onOk(()=>{
+                this.newUserReset();
+                this.queryUserList();
+              }) ;
+            }
+            
+          } catch (error) {
+            console.log('error',error)
           }
-          
-        } catch (error) {
-          console.log('error',error)
+          this.loading = false;
         }
-        this.loading = false;
       },
 
       async updateUser(){

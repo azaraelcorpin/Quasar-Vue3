@@ -34,7 +34,7 @@ export default {
     return {
       headers:{
         'X-IV': iv.toString(CryptoJS.enc.Base64),
-        Authorization:'Bearer '+ encryptedData
+        Authorization:'Bearer '+ encryptedData,
       } 
     }
   },
@@ -104,8 +104,8 @@ export default {
           return {error:response}
         }
       } catch (error) {
-        console.log('error',error.response.data);
-        return { error:error.response }
+        console.log('error',error.message);
+        return { error:error }
       }
     },  
 
@@ -134,6 +134,7 @@ export default {
       }
     },  
 
+    //// update User
     async updateUser(param) {
       var url = api_url+'/user/update'
       const config = await this.getAuthorization();
@@ -220,7 +221,77 @@ export default {
         return { error: error.response }??error
       }
     },    
+
+    ///// new User
+    async newOffice(param) {
+      var url = api_url+'/office/new'
+      const config = await this.getAuthorization();
+      const body = {
+        code:param.code,
+        description:param.description,
+        is_sector:param.is_sector.val,
+        topOfficeId:param.hasTopOffice?param.topOfficeId.id:null,
+        }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('newOffice Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },      
+
+    //// update Office
+    async updateOffice(param) {
+      var url = api_url+'/office/update'
+      const config = await this.getAuthorization();
+      const body = {
+        id:param.id,
+        code:param.code,
+        description:param.description,
+        is_sector:param.is_sector.val,
+        topOfficeId:param.hasTopOffice?param.topOfficeId.id:null,
+        }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('Update Office Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },       
     
+    ///// Delete Office
+    async deleteOffice(param) {
+      var url = api_url+'/office/delete'
+      const config = await this.getAuthorization();
+      const body = {
+        id:param.id,
+        }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('deleteOffice Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },  
+
     ///// getAllPcrSchedule 
     async getAllPcrSchedule() {
       var url = api_url+'/pcr_schedule/all'

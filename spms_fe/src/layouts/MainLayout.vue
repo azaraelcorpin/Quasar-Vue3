@@ -162,7 +162,8 @@ export default defineComponent({
     const monitorCookie = () => {
       intervalId = setInterval(() => {
         console.log('Monitoring',cookies.isKey('_UID_'))
-        if(!cookies.isKey('_UID_')){                    
+        if(!cookies.isKey('_UID_')){ 
+              localStorage.clear();               
               router.push({name:'signIn'});
         }
       }, 5000); // Check every second

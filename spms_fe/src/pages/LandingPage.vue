@@ -56,10 +56,14 @@ export default{
                 loading.value=false;
               }
               else{
-                try {                  
-                  let response = await api.generateSessionId(SID);                 
-                  if(response.error)
-                    throw new Error(response.error.data.message);
+                try {         
+                  let response = await api.generateSessionId(SID);   
+                  console.log('reso',response)              
+                  if(response.error){
+                    if(response.error.response)
+                    throw new Error(response.error.response.data.message);
+                    throw new Error(response.error.message);
+                  }
                   if(response.status === 'OK'){
                       let sid=response.session.sessionId;
                       SID.sid=sid
@@ -74,7 +78,9 @@ export default{
                   }
                       router.push({ path: 'dashboard'})
                       loading.value=false;
+                      window.location.reload();
                 } catch (error) { 
+                  console.log('reso',error) 
                   loading.value=false;
                   myDialog.negative($q,'Error',error.message)
 
