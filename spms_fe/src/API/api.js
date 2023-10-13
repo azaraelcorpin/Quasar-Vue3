@@ -34,7 +34,7 @@ export default {
     return {
       headers:{
         'X-IV': iv.toString(CryptoJS.enc.Base64),
-        Authorization:'Bearer '+ encryptedData
+        Authorization:'Bearer '+ encryptedData,
       } 
     }
   },
@@ -104,8 +104,8 @@ export default {
           return {error:response}
         }
       } catch (error) {
-        console.log('error',error.response.data);
-        return { error:error.response }
+        console.log('error',error.message);
+        return { error:error }
       }
     },  
 
@@ -134,6 +134,7 @@ export default {
       }
     },  
 
+    //// update User
     async updateUser(param) {
       var url = api_url+'/user/update'
       const config = await this.getAuthorization();
@@ -151,7 +152,7 @@ export default {
         if (response && response.data && response.status == 200) {
           return response.data;
         } else{
-          console.log('newUser Error');
+          console.log('Update User Error');
           return {error:response}
         }
       } catch (error) {

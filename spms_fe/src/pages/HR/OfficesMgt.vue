@@ -13,11 +13,11 @@
       <q-card class="pa-1">      
 
         <q-card-section class="container--fluid" style="height: 89vh;">
-          <div class="text-h4">User Management </div>
-          <!-- new User dialog -->
-          <q-dialog v-model="newUserDialog" persistent >
+          <div class="text-h4">Office Management </div>
+          <!-- new Office dialog -->
+          <q-dialog v-model="newOfficeDialog" persistent >
             <q-card  :style="{ width: $q.screen.xs ? '100%' : '50%' }" >   
-              <q-form @submit="newUser" @reset="newUserReset">
+              <q-form @submit="newOffice" @reset="newOfficeReset">
                 <q-inner-loading :showing="loading"
                 label="Updating Record..."
                 label-class="text-black"
@@ -27,75 +27,74 @@
                 >
               </q-inner-loading>
                 <q-page-container style="padding:10px;" >                
-                  <div class="text-h5" style="margin: 5px;">{{!NEW_USER.email_old?'New ':'Update '}} User</div> 
+                  <div class="text-h5" style="margin: 5px;">{{!NEW_OFFICE.id?'New ':'Update '}} Office</div> 
+
                   <q-input 
                     required 
-                    label="Email" 
+                    label="Code" 
                     dense 
                     outlined 
                     class="q-pa-sm" 
                     color="primary" 
-                    v-model="NEW_USER.email"
-                    :rules="[rules.properEmail,rules.requiredField]"
+                    v-model="NEW_OFFICE.code"
+                    :rules="[rules.requiredField,rules.noSpaceStart]"
                     >
-                    <template v-slot:prepend>
-                      <q-icon name="email" />
-                    </template>
-                  </q-input>   
+                  </q-input> 
 
                   <q-input 
-                    label="Fullname" 
+                    required 
+                    label="Description" 
                     dense 
                     outlined 
                     class="q-pa-sm" 
                     color="primary" 
-                    v-model="NEW_USER.userName"
-                    :rules="[rules.requiredField,rules.notEmpty,rules.noSpaceStart]"
+                    v-model="NEW_OFFICE.description"
+                    :rules="[rules.requiredField,rules.noSpaceStart]"
                     >
-                    <template v-slot:prepend>
-                      <q-icon name="person_outline" />
-                    </template>
-                  </q-input>  
-
-                  <!-- OFFICE_HEAD is excluded from selection, 
-                      OFFICE_HEAD is at employee.position table
-                  -->
+                  </q-input>                   
                   <q-select 
                     outlined  
-                     :options="['ADMIN','PMT','HR','OFFICE_STAFF']" 
-                    label="User Type" 
+                     :options="[{val:0,desc:'Office'},{val:1,desc:'Sector'}]" 
+                     option-label="desc"
+                     option-value="val"
+                     @popup-hide="()=>{
+                      if(NEW_OFFICE.is_sector.val===1){
+                        NEW_OFFICE.hasTopOffice = true;
+                        disableHasTopOfficeCheckBox = true;
+                      }else{
+                        disableHasTopOfficeCheckBox = false;
+                      }
+                     }"
+                    label="Office Type" 
                     class="q-pa-sm" 
                     color="primary" 
-                    v-model="NEW_USER.userType"
+                    v-model="NEW_OFFICE.is_sector"
                     :rules="[rules.requiredField]"
                     >
-                    <template v-slot:prepend>
-                      <q-icon name="assignment_ind" />
-                    </template>
                   </q-select>
-
-                  <q-select 
-                    v-if="NEW_USER.userType === 'OFFICE_STAFF'"
+                  <q-checkbox
+                    right-label
+                    v-model="NEW_OFFICE.hasTopOffice"
+                    label="Has Top Office"
+                    checked-icon="task_alt"
+                    unchecked-icon="highlight_off"   
+                    :disable="disableHasTopOfficeCheckBox" 
+                  />
+                  <q-select v-if="NEW_OFFICE.hasTopOffice"
                     outlined  
-                    :options="offices" 
-                    option-label="code"
-                    label="Office" 
+                     :options="Officelist.filter((office)=> office.is_sector === 0  && office.id !== NEW_OFFICE.id)" 
+                     option-label="code"
+                     option-value="id"
+                    label="Top Office" 
                     class="q-pa-sm" 
-                    color="primary"  
-                    v-model="NEW_USER.officeId"
-                    :rules="[rules.requiredField]"
+                    color="primary" 
+                    v-model="NEW_OFFICE.topOfficeId"
+                    :rules="NEW_OFFICE.is_sector.val===1 || NEW_OFFICE.hasTopOffice?[rules.requiredField]:[]"
                     >
-                    <template v-slot:prepend>
-                      <q-icon name="assignment" />
-                    </template>                
                   </q-select>
 
-                  <div class="q-gutter-sm" v-if="NEW_USER.email_old">
-                    <q-radio v-model="NEW_USER.status" val="Active" label="Active" />
-                    <q-radio v-model="NEW_USER.status" val="Inactive" label="Inactive" />
-                  </div>
                   <div style="display: flex; justify-content: flex-end;">
-                    <q-btn class="q-ma-md" color="primary" v-if="NEW_USER.email_old" type="submit">Update</q-btn>
+                    <q-btn class="q-ma-md" color="primary" v-if="NEW_OFFICE.id" type="submit">Update</q-btn>
                     <q-btn class="q-ma-md" color="primary" v-else type="submit">Save</q-btn>
                     <q-btn class="q-ma-md" type="reset">Cancel</q-btn>
                   </div>
@@ -105,11 +104,11 @@
             </q-card>
           </q-dialog>
           <!-- end dialog -->
-          <!-- user list table  -->
+          <!-- Office list table  -->
             <q-table
               class="my-sticky-header-table"
-              :grid="$q.screen.xs"
-              :rows="userlist"
+              :grid="false"
+              :rows="Officelist"
               :columns="header"
               row-key="email"
               :rows-per-page-options="[ 10, 1, 15, 20, 25, 50, 0 ]"
@@ -117,24 +116,14 @@
               :style="{height: $q.screen.xs ? '90.5%' : '96.5%', 'overflow-y': 'auto'}"
               virtual-scroll-sticky-size-start="100"
             >
-              <template v-slot:body-cell="props">
-                <q-td
-                  :props="props"
-                  :class="(props.row.status =='Inactive')?'text-red':'text-black'"
-                >
-                  {{props.value}}
-                </q-td>
-              </template>
-
               <template v-slot:body-cell-action="props">
-                <q-td :props="props" 
-                  :class="(props.row.status =='Inactive')?'text-red':'text-black'">
-                  <q-btn color="positive" icon="edit" round flat @click="showUpdateUserDialog(props.row)"></q-btn>
-                  <q-btn color="negative" icon="delete" round flat @click="deleteUser(props.row)"></q-btn>
+                <q-td :props="props">
+                  <q-btn color="positive" icon="edit" round flat @click="showUpdateOfficeDialog(props.row)"></q-btn>
+                  <q-btn color="negative" icon="delete" round flat @click="deleteOffice(props.row)"></q-btn>
                 </q-td>
               </template>   
               <template v-slot:top>
-                <q-btn push color="primary" @click=" newUserReset(), newUserDialog = !newUserDialog">New User</q-btn>
+                <q-btn push color="primary" @click=" newOfficeReset(), newOfficeDialog = !newOfficeDialog">New Office</q-btn>
                   <q-space />
                   <q-input dense debounce="300" color="primary" v-model="filter" placeholder="Search">
                     <template v-slot:append>
@@ -161,8 +150,8 @@
                         >{{col.value}}
                         </q-chip>
                         <div v-else-if="col.name === 'action'"  class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
-                          <q-btn color="positive" icon="edit" round flat @click="showUpdateUserDialog(props.row)"></q-btn>
-                          <q-btn color="negative" icon="delete" round flat @click="deleteUser(props.row)"></q-btn>
+                          <q-btn color="positive" icon="edit" round flat @click="showUpdateOfficeDialog(props.row)"></q-btn>
+                          <q-btn color="negative" icon="delete" round flat @click="deleteOffice(props.row)"></q-btn>
                         </div>
                         <q-item-label v-else caption :class="col.classes ? col.classes : ''">{{ col.value }}</q-item-label>
                       </q-item-section>
@@ -187,7 +176,7 @@
   import { useQuasar } from 'quasar'
   
   export default defineComponent({
-    name: 'UserMgt',
+    name: 'OfficeMgt',
     setup(){
       const $q = useQuasar();
       return{
@@ -201,48 +190,37 @@
 
       },
 
-      async queryOffices(){
+      async queryOfficeList(){
         try {
           this.loading = true;
           let response = await api.getAllOffice();
-          console.log('getOffices', response.message)
-          this.offices = response.OFFICES;
+          console.log('getAllOffice', response)
+          this.Officelist = response.OFFICES;          
         } catch (error) {
           console.log('error',error)
         }
         this.loading = false;
       },
 
-      async queryUserList(){
+      async newOffice(){
+        console.log('NewOffice',this.NEW_OFFICE)
+        if(this.NEW_OFFICE.id){
+          this.updateOffice()
+        }else{
         try {
           this.loading = true;
-          let response = await api.getAllUser();
-          console.log('getAllUser', response)
-          this.userlist = response.USERS;
-        } catch (error) {
-          console.log('error',error)
-        }
-        this.loading = false;
-      },
-
-      async newUser(){
-        if(this.NEW_USER.email_old){
-          this.updateUser()
-        }else{
-          try {
-            this.loading = true;
-            console.log(this.NEW_USER);
-            let response = await api.newUser(this.NEW_USER);
-            console.log('newUser',response)          
-            if(response.error){
-              dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
-            }else{
-              dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-                this.newUserReset();
-                this.queryUserList();
-              }) ;
-            }
-            
+          console.log(this.NEW_OFFICE);
+          let response = await api.newOffice(this.NEW_OFFICE);
+          console.log('newOffice',response)          
+          if(response.error){
+            dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
+          }else{
+            dialog.positive(this.$q,response.status,response.message).onOk(()=>{
+              this.newOfficeReset();
+              this.queryOfficeList();
+            }) ;
+          }
+          
           } catch (error) {
             console.log('error',error)
           }
@@ -250,26 +228,21 @@
         }
       },
 
-      async updateUser(){
+      async updateOffice(){
         try {
-          
-          dialog.confirm(this.$q,"Confirmation","Would you like to update this user?")
+          console.log(this.NEW_OFFICE)
+          dialog.confirm(this.$q,"Confirmation","Would you like to update this Office?")
           .onOk(async() => {
               this.loading = true;
-              let response = await api.updateUser(this.NEW_USER);
-              console.log('updateUser',response)      
+              let response = await api.updateOffice(this.NEW_OFFICE);
+              console.log('updateOffice',response)      
               if(response.error){
                 dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
               }else{
                 this.loading = false; 
                 dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-                  // this.queryUserList();
-                  this.testObj.email = this.NEW_USER.email
-                  this.testObj.username = this.NEW_USER.userName
-                  this.testObj.office = this.NEW_USER.userType === 'OFFICE_STAFF'?this.NEW_USER.officeId.code:null
-                  this.testObj.user_type = this.NEW_USER.userType
-                  this.testObj.status = this.NEW_USER.status
-                  this.newUserReset();
+                  this.queryOfficeList();
+                  this.newOfficeReset();
                 }) ;
               }     
               this.loading = false;                                      
@@ -280,19 +253,19 @@
         this.loading = false;
       },      
 
-      async deleteUser(param){
+      async deleteOffice(param){
         try {
 
-          dialog.confirm(this.$q,"Confirmation","Would you like to delete "+param.email+"?")
+          dialog.confirm(this.$q,"Confirmation","Would you like to delete the Office ID No. "+param.id+"?")
           .onOk(async() => {
               this.loading = true;
-              let response = await api.deleteUser(param);
-              console.log('deleteUser',response)          
+              let response = await api.deleteOffice(param);
+              console.log('deleteOffice',response)          
               if(response.error){
                 dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
               }else{
                 dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-                  this.queryUserList();
+                  this.queryOfficeList();
                 }) ;
               }
               this.loading = false;
@@ -307,36 +280,49 @@
         this.loading = false;
       },
 
-      showUpdateUserDialog(row){
-        this.testObj = row;
+      showUpdateOfficeDialog(row){
+        this.testObj = row;        
         let tmp = {...row};
-        this.NEW_USER.email = tmp.email;
-        this.NEW_USER.userName = tmp.username;
-        this.NEW_USER.userType = tmp.user_type;
-        this.NEW_USER.officeId = this.offices.find((office)=> office.id === tmp.office_id);
-        this.NEW_USER.email_old = tmp.email;
-        this.NEW_USER.status = tmp.status;
-        this.newUserDialog = true;
+        console.log('start', tmp)
+        this.NEW_OFFICE.id = tmp.id;
+        this.NEW_OFFICE.code = tmp.code;
+        this.NEW_OFFICE.description = tmp.Description;
+        this.NEW_OFFICE.is_sector = tmp.is_sector?{val:1,desc:'Sector'}:{val:0,desc:'Office'};
+        this.NEW_OFFICE.topOfficeId = this.Officelist.find((office)=> office.id === tmp.top_office);
+        this.NEW_OFFICE.hasTopOffice = tmp.top_office_code?true:false;
+        this.newOfficeDialog = true;
       },
 
-      newUserReset(){
-        this.NEW_USER={
-              email:null,
-              userName:null,
-              userType:null,
-              officeId:null,
-              email_old:null,
-              status:null,
+      newOfficeReset(){
+        this.NEW_OFFICE={
+              id:null,
+              code:null,
+              description:null,
+              is_sector:{val:0,desc:'Office'},
+              topOfficeId:null,
+              hasTopOffice:false,
             }
-            this.newUserDialog = false;
-      }
+            this.newOfficeDialog = false;
+      },
+      formatDate(dateString) {
+        const dateObject = new Date(dateString);
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return dateObject.toLocaleDateString(undefined, options);
+      },
+      formatDateToDateSelect(DateVariable){
+        const formattedDate = new Date(DateVariable)
+          .toISOString()
+          .slice(0, 10)
+          .replace(/-/g, "/");
+          return formattedDate
+      },
     },
     data(){
       return {
         testObj:{},
         filter:"",
         loading:false,
-        newUserDialog:false,
+        newOfficeDialog:false,
         rules: {
                 noSpace: v => (!v?.includes(' ')) || "No space allowed.",
                 notEmpty:(v) => (v && v.replaceAll(' ','').length > 0) ||  "Empty Value.",
@@ -352,49 +338,49 @@
                 // float: (v) => ((!isNaN(this.StringToNumber(v)) && this.StringToNumber(v).indexOf('.') != -1) || (!isNaN(this.StringToNumber(v)) && /^[0-9]*$/.test(this.StringToNumber(v)))) || "Must be a number"
                 ///^(09|\+639)\d{9}$/ <- if needed full philippine mobile number 
             },
-            NEW_USER:{
-              email:null,
-              userName:null,
-              userType:null,
-              officeId:null,
-              email_old:null,
-              status:null,
-            },
-        offices:[],
+        NEW_OFFICE:{
+          id:null,
+          code:null,
+          description:null,
+          is_sector:{val:0,desc:'Office'},
+          topOfficeId:null,
+          hasTopOffice:false,
+        },
         header : [
             {
-              name: 'email',
-              label: 'Email',
+              name: 'id',
+              label: 'ID',
               align: 'left',
-              field: 'email',
+              field: 'id',
               sortable: true
             },
             {
-              name: 'userName',
-              label: 'Fullname',
+              name: 'code',
+              label: 'Code',
               align: 'left',
-              field: 'username',
+              field: 'code',
               sortable: true
             },
             {
-              name: 'userType',
-              label: 'User Type',
+              name: 'description',
+              label: 'Description',
               align: 'left',
-              field: 'user_type',
+              field: 'Description',
               sortable: true
             },
             {
-              name: 'office',
-              label: 'Office',
+              name: 'topOffice',
+              label: 'Top Office',
               align: 'left',
-              field: 'office',
+              field: 'top_office_code',
               sortable: true
             },
             {
-              name: 'status',
-              label: 'Status',
+              name: 'is_sector',
+              label: 'Office Type',
               align: 'left',
-              field: 'status',
+              field: 'is_sector',
+              format:(val,row)=>{return val===0?"Office":"Sector"},
               sortable: true
             },
             {
@@ -403,13 +389,25 @@
               align: 'center',
             },
           ],
-        userlist:[],
+          Officelist:[],
+          disableHasTopOfficeCheckBox:false,
       };
     },
     mounted(){
-      this.queryOffices();
-      this.queryUserList();
-    }
+      this.queryOfficeList();
+    },
+    // watch:{
+    //   NEW_OFFICE_is_sector(newVal,oldVal){
+    //     if(this.NEW_OFFICE.is_sector){
+    //       if(this.NEW_OFFICE.is_sector.val === 1){
+    //         this.NEW_OFFICE.hasTopOffice = true;
+    //         this.disableHasTopOfficeCheckBox = true;
+    //       }else{
+    //         this.disableHasTopOfficeCheckBox = true;
+    //       }
+    //     }
+    //   }
+    // }
   })
   </script>
   <style>

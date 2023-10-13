@@ -74,7 +74,7 @@ const routes = [
     children:[
       {
         path: '/pcr_sched',
-        component: () => import('pages/sysAdmin/UserMgt.vue'),
+        component: () => import('pages/PMT/ScheduleMgt.vue'),
         meta:{
           title:'PCR Schedule',
         },
