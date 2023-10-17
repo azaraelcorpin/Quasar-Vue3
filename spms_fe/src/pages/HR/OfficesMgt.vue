@@ -12,175 +12,225 @@
 
       <q-card class="pa-1">      
 
-        <q-card-section class="container--fluid" style="height: 89vh;">
+        <q-card-section class="container--fluid" >
           <div class="text-h4">Office Management </div>
-          <!-- new Office dialog -->
-          <q-dialog v-model="newOfficeDialog" persistent >
-            <q-card  :style="{ width: $q.screen.xs ? '100%' : '50%' }" >   
-              <q-form @submit="newOffice" @reset="newOfficeReset">
-                <q-inner-loading :showing="loading"
-                label="Updating Record..."
-                label-class="text-black"
-                label-style="font-size: 1.1em"
-                color="black"
-                style="z-index: 1000;" 
-                >
-              </q-inner-loading>
-                <q-page-container style="padding:10px;" >                
-                  <div class="text-h5" style="margin: 5px;">{{!NEW_OFFICE.id?'New ':'Update '}} Office</div> 
+        <q-card style="height:80vh;">
+        <q-tabs 
+          v-model="tab"
+          dense
+          class="text-grey"
+          active-color="primary"
+          indicator-color="primary"
+          align="justify"
+          narrow-indicator
+        >
+          <q-tab name="table" label="Table View" />
+          <q-tab name="tree" label="Tree View" />
+        </q-tabs>
 
-                  <q-input 
-                    required 
-                    label="Code" 
-                    dense 
-                    outlined 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_OFFICE.code"
-                    :rules="[rules.requiredField,rules.noSpaceStart]"
+        <q-separator />
+
+        <q-tab-panels v-model="tab" animated style="overflow-y: auto;max-height: 75vh;padding: 0%;" >
+          <q-tab-panel name="table" style=" scroll;padding: 0%;;max-height: 75vh" >
+         <!-- new Office dialog -->
+            <q-dialog v-model="newOfficeDialog" persistent >
+                <q-card  :style="{ width: $q.screen.xs ? '100%' : '50%' }" >   
+                  <q-form @submit="newOffice" @reset="newOfficeReset">
+                    <q-inner-loading :showing="loading"
+                    label="Updating Record..."
+                    label-class="text-black"
+                    label-style="font-size: 1.1em"
+                    color="black"
+                    style="z-index: 1000;" 
                     >
-                  </q-input> 
+                  </q-inner-loading>
+                    <q-page-container style="padding:10px;" >                
+                      <div class="text-h5" style="margin: 5px;">{{!NEW_OFFICE.id?'New ':'Update '}} Office</div> 
 
-                  <q-input 
-                    required 
-                    label="Description" 
-                    dense 
-                    outlined 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_OFFICE.description"
-                    :rules="[rules.requiredField,rules.noSpaceStart]"
-                    >
-                  </q-input>                   
-                  <q-select 
-                    outlined  
-                     :options="[{val:0,desc:'Office'},{val:1,desc:'Sector'}]" 
-                     option-label="desc"
-                     option-value="val"
-                     @popup-hide="()=>{
-                      if(NEW_OFFICE.is_sector.val===1){
-                        NEW_OFFICE.hasTopOffice = true;
-                        disableHasTopOfficeCheckBox = true;
-                      }else{
-                        disableHasTopOfficeCheckBox = false;
-                      }
-                     }"
-                    label="Office Type" 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_OFFICE.is_sector"
-                    :rules="[rules.requiredField]"
-                    >
-                  </q-select>
-                  <q-checkbox
-                    right-label
-                    v-model="NEW_OFFICE.hasTopOffice"
-                    label="Has Top Office"
-                    checked-icon="task_alt"
-                    unchecked-icon="highlight_off"   
-                    :disable="disableHasTopOfficeCheckBox" 
-                  />
-                  <q-select v-if="NEW_OFFICE.hasTopOffice"
-                    outlined  
-                     :options="Officelist.filter((office)=> office.is_sector === 0  && office.id !== NEW_OFFICE.id)" 
-                     option-label="code"
-                     option-value="id"
-                    label="Top Office" 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_OFFICE.topOfficeId"
-                    :rules="NEW_OFFICE.is_sector.val===1 || NEW_OFFICE.hasTopOffice?[rules.requiredField]:[]"
-                    >
-                  </q-select>
+                      <q-input 
+                        required 
+                        label="Code" 
+                        dense 
+                        outlined 
+                        class="q-pa-sm" 
+                        color="primary" 
+                        v-model="NEW_OFFICE.code"
+                        :rules="[rules.requiredField,rules.noSpaceStart]"
+                        >
+                      </q-input> 
 
-                  <div style="display: flex; justify-content: flex-end;">
-                    <q-btn class="q-ma-md" color="primary" v-if="NEW_OFFICE.id" type="submit">Update</q-btn>
-                    <q-btn class="q-ma-md" color="primary" v-else type="submit">Save</q-btn>
-                    <q-btn class="q-ma-md" type="reset">Cancel</q-btn>
-                  </div>
+                      <q-input 
+                        required 
+                        label="Description" 
+                        dense 
+                        outlined 
+                        class="q-pa-sm" 
+                        color="primary" 
+                        v-model="NEW_OFFICE.description"
+                        :rules="[rules.requiredField,rules.noSpaceStart]"
+                        >
+                      </q-input>                   
+                      <q-select 
+                        outlined  
+                        :options="[{val:0,desc:'Office'},{val:1,desc:'Sector'}]" 
+                        option-label="desc"
+                        option-value="val"
+                        @popup-hide="()=>{
+                          if(NEW_OFFICE.is_sector.val===1){
+                            NEW_OFFICE.hasTopOffice = true;
+                            disableHasTopOfficeCheckBox = true;
+                          }else{
+                            disableHasTopOfficeCheckBox = false;
+                          }
+                        }"
+                        label="Office Type" 
+                        class="q-pa-sm" 
+                        color="primary" 
+                        v-model="NEW_OFFICE.is_sector"
+                        :rules="[rules.requiredField]"
+                        >
+                      </q-select>
+                      <q-checkbox
+                        right-label
+                        v-model="NEW_OFFICE.hasTopOffice"
+                        label="Has Top Office"
+                        checked-icon="task_alt"
+                        unchecked-icon="highlight_off"   
+                        :disable="disableHasTopOfficeCheckBox" 
+                      />
+                      <q-select v-if="NEW_OFFICE.hasTopOffice"
+                        outlined  
+                        :options="Officelist.filter((office)=> office.is_sector === 0  && office.id !== NEW_OFFICE.id)" 
+                        option-label="code"
+                        option-value="id"
+                        label="Top Office" 
+                        class="q-pa-sm" 
+                        color="primary" 
+                        v-model="NEW_OFFICE.topOfficeId"
+                        :rules="NEW_OFFICE.is_sector.val===1 || NEW_OFFICE.hasTopOffice?[rules.requiredField]:[]"
+                        >
+                      </q-select>
 
-                </q-page-container>
-              </q-form>           
-            </q-card>
-          </q-dialog>
-          <!-- end dialog -->
-          <!-- Office list table  -->
-            <q-table
-              class="my-sticky-header-table"
-              :grid="false"
-              :rows="Officelist"
-              :columns="header"
-              row-key="email"
-              :rows-per-page-options="[ 10, 1, 15, 20, 25, 50, 0 ]"
-              :filter="filter"
-              :style="{height: $q.screen.xs ? '90.5%' : '96.5%', 'overflow-y': 'auto'}"
-              virtual-scroll-sticky-size-start="100"
-            >
-              <template v-slot:body-cell-action="props">
-                <q-td :props="props">
-                  <q-btn color="positive" icon="edit" round flat @click="showUpdateOfficeDialog(props.row)"></q-btn>
-                  <q-btn color="negative" icon="delete" round flat @click="deleteOffice(props.row)"></q-btn>
-                </q-td>
-              </template>   
-              <template v-slot:top>
-                <q-btn push color="primary" @click=" newOfficeReset(), newOfficeDialog = !newOfficeDialog">New Office</q-btn>
-                  <q-space />
-                  <q-input dense debounce="300" color="primary" v-model="filter" placeholder="Search">
-                    <template v-slot:append>
-                      <q-icon name="search" />
-                    </template>
-                  </q-input>
-              </template>
+                      <div style="display: flex; justify-content: flex-end;">
+                        <q-btn class="q-ma-md" color="primary" v-if="NEW_OFFICE.id" type="submit">Update</q-btn>
+                        <q-btn class="q-ma-md" color="primary" v-else type="submit">Save</q-btn>
+                        <q-btn class="q-ma-md" type="reset">Cancel</q-btn>
+                      </div>
 
-              <!-- ↓↓↓↓↓ this is for gridview such as viewing on small screen like android -->
-              <template v-slot:item="props">
-                <q-card style="width: 100%;height:min-content;" class="q-ma-sm">
-                  <q-list dense>
-                    <q-item v-for="col in props.cols" :key="col.name">
-                      <q-item-section>
-                        <q-item-label>{{ col.label }}</q-item-label>
-                      </q-item-section>
-                      <q-item-section side>
-                        <q-chip v-if="col.name === 'status'"
-                          :color="props.row.status == 'Active' ? 'green': props.row.status == 'Disable' ? 'red': 'grey'"
-                          text-color="white"
-                          dense
-                          class="text-weight-bolder"
-                          square
-                        >{{col.value}}
-                        </q-chip>
-                        <div v-else-if="col.name === 'action'"  class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
-                          <q-btn color="positive" icon="edit" round flat @click="showUpdateOfficeDialog(props.row)"></q-btn>
-                          <q-btn color="negative" icon="delete" round flat @click="deleteOffice(props.row)"></q-btn>
-                        </div>
-                        <q-item-label v-else caption :class="col.classes ? col.classes : ''">{{ col.value }}</q-item-label>
-                      </q-item-section>
-                    </q-item>
-                  </q-list>
+                    </q-page-container>
+                  </q-form>           
                 </q-card>
+              </q-dialog>
+              <!-- end dialog -->
+              <!-- Office list table  -->
+                <q-table
+                  class="my-sticky-header-table"
+                  :grid=" $q.screen.xs"
+                  :rows="Officelist"
+                  :columns="header"
+                  row-key="email"
+                  :rows-per-page-options="[ 5, 1, 10, 15, 20, 25, 50, 0 ]"
+                  :filter="filter"
+                  :style="{height: $q.screen.xs ? '90.5%' : '96.5%', 'overflow-y': 'auto'}"
+                  virtual-scroll-sticky-size-start="100"
+                >
+                  <template v-slot:body-cell-action="props">
+                    <q-td :props="props">
+                      <q-btn color="positive" icon="edit" round flat @click="showUpdateOfficeDialog(props.row)"></q-btn>
+                      <q-btn color="negative" icon="delete" round flat @click="deleteOffice(props.row)"></q-btn>
+                    </q-td>
+                  </template>   
+                  <template v-slot:top>
+                    <q-btn push color="primary" @click=" newOfficeReset(), newOfficeDialog = !newOfficeDialog">New Office</q-btn>
+                      <q-space />
+                      <q-input dense debounce="300" color="primary" v-model="filter" placeholder="Search">
+                        <template v-slot:append>
+                          <q-icon name="search" />
+                        </template>
+                      </q-input>
+                  </template>
 
+                  <!-- ↓↓↓↓↓ this is for gridview such as viewing on small screen like android -->
+                  <template v-slot:item="props">
+                    <q-card style="width: 100%;height:min-content;" class="q-ma-sm">
+                      <q-list dense>
+                        <q-item v-for="col in props.cols" :key="col.name">
+                          <q-item-section>
+                            <q-item-label>{{ col.label }}</q-item-label>
+                          </q-item-section>
+                          <q-item-section side>
+                            <q-chip v-if="col.name === 'status'"
+                              :color="props.row.status == 'Active' ? 'green': props.row.status == 'Disable' ? 'red': 'grey'"
+                              text-color="white"
+                              dense
+                              class="text-weight-bolder"
+                              square
+                            >{{col.value}}
+                            </q-chip>
+                            <div v-else-if="col.name === 'action'"  class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+                              <q-btn color="positive" icon="edit" round flat @click="showUpdateOfficeDialog(props.row)"></q-btn>
+                              <q-btn color="negative" icon="delete" round flat @click="deleteOffice(props.row)"></q-btn>
+                            </div>
+                            <q-item-label v-else caption :class="col.classes ? col.classes : ''">{{ col.value }}</q-item-label>
+                          </q-item-section>
+                        </q-item>
+                      </q-list>
+                    </q-card>
+
+                  </template>
+                  <!-- ↑↑↑↑↑ this is for gridview such as viewing on small screen like android -->
+
+                </q-table>
+              <!-- end list table  -->
+          </q-tab-panel>
+
+          <q-tab-panel name="tree"  style="display: flex;  justify-content: center;align-items: center;">
+
+          <blocks-tree :data="treeData" :horizontal="treeOrientation=='1'"  :collapsable="true"  labelClassName="bold-text"
+                :props="{label: 'code', expand: 'expand', children: 'nodes',  key:'id'}"
+          >
+                <template #node="{data}">
+                  <div @click="dialog.info($q,data.code,data.Description)" style="cursor: pointer;">   {{data.code}}</div>
               </template>
-              <!-- ↑↑↑↑↑ this is for gridview such as viewing on small screen like android -->
-
-            </q-table>
-          <!-- end list table  -->
-        </q-card-section>
+          </blocks-tree>
+          </q-tab-panel>
+        </q-tab-panels>
       </q-card>
+      </q-card-section>
+    </q-card>
     </q-page>
   </template>
   
   <script>
-  import { defineComponent } from 'vue'  
+  import { defineComponent,ref} from 'vue'  
   import api from "src/API/api";
   import dialog from "src/plugins/myDialog"
   import { useQuasar } from 'quasar'
+  import BlocksTree from 'vue3-blocks-tree'
+  import 'vue3-blocks-tree/dist/vue3-blocks-tree.css';
   
   export default defineComponent({
     name: 'OfficeMgt',
+    components: {
+      BlocksTree
+    },
     setup(){
+      let selected = ref([]);
+      let treeOrientation = ref("0");
+      const toggleSelect = (node, isSelected) => {
+            isSelected ? selected.value.push(node.some_id) : selected.value.splice(selected.value.indexOf(node.some_id), 1);
+            if(node.children && node.children.length) {
+                node.children.forEach(ch=>{
+                    toggleSelect(ch,isSelected)
+                })
+            }
+        }
       const $q = useQuasar();
       return{
-        dialog
+        dialog,
+        selected,
+        toggleSelect,
+        treeOrientation
       }
     },
     methods:{
@@ -195,7 +245,8 @@
           this.loading = true;
           let response = await api.getAllOffice();
           console.log('getAllOffice', response)
-          this.Officelist = response.OFFICES;          
+          this.Officelist = response.OFFICES;  
+          this.toTreeData(this.Officelist) 
         } catch (error) {
           console.log('error',error)
         }
@@ -316,6 +367,38 @@
           .replace(/-/g, "/");
           return formattedDate
       },
+      toTreeData(originalData) {
+          // Create an object to hold the transformed data
+          const transformedData = {
+              "OFFICES": [],
+          };
+          // Create a map to quickly look up offices by their ID
+          const officeMap = {};
+
+          // Iterate through the original data and create the hierarchy
+          originalData.forEach((office) => {
+              const { Description, code, id, is_sector, top_office, top_office_code } = office;
+              const node = {
+                  Description,
+                  code,
+                  label: code,
+                  id,
+                  is_sector,
+                  nodes: [],
+              };
+
+              // Store the office in the map for quick access
+              officeMap[id] = node;
+
+              // Find the parent office and add this node as its child
+              if (top_office && officeMap[top_office]) {
+                  officeMap[top_office].nodes.push(node);
+              } else {
+                  transformedData.OFFICES.push(node);
+              }
+          });
+          this.treeData = transformedData.OFFICES[0]
+      },
     },
     data(){
       return {
@@ -391,6 +474,8 @@
           ],
           Officelist:[],
           disableHasTopOfficeCheckBox:false,
+          treeData:[],
+          tab:"table"
       };
     },
     mounted(){
@@ -415,10 +500,9 @@
         height: 89vh;
       }
     .my-sticky-header-table .q-table__middle {
-      max-height: 89vh;
+      max-height: 80vh;
     }
     .my-sticky-header-table .q-table__top,
-    .my-sticky-header-table .q-table__bottom,
     .my-sticky-header-table thead tr:first-child th {
       background-color: #ffffff;
       z-index: 1000;
@@ -430,5 +514,8 @@
     .grid-style-transition {
       transition: transform 0.28s, background-color 0.28s;
     }
+    .bold-text {
+  font-weight: bold;
+}
   </style>
   

@@ -24,7 +24,7 @@ const routes = [
   },
   {
     path: '/myPCR',
-    component: () => import('pages/TestPages.vue'),
+    component: () => import('pages/TreeSample.vue'),
     meta:{
       title:'My PCR',
       roles:['INDIVIDUAL']
