@@ -74,7 +74,7 @@ export default{
 
                       localStorage.clear();
                       localStorage.setItem("userRoles",JSON.stringify(response.session.ROLES))    
-                      localStorage.setItem("office_id",JSON.stringify(response.session.office_id))                
+                      localStorage.setItem("officesAndRoles",JSON.stringify(response.session.officesAndRoles))                
                   }
                       router.push({ path: 'dashboard'})
                       loading.value=false;

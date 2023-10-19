@@ -1,5 +1,6 @@
 
 const routes = [
+  ///Home
   {
     path: '/',
     name:'home',
@@ -11,6 +12,7 @@ const routes = [
     icon:'home',
     visible:false,
   },
+  ///Dashboard
   {
     path: '/dashboard',
     name:'dashboard',
@@ -22,16 +24,18 @@ const routes = [
     icon:'dashboard',
     visible:true,
   },
+  ///MyPCR
   {
     path: '/myPCR',
     component: () => import('pages/TreeSample.vue'),
     meta:{
       title:'My PCR',
-      roles:['INDIVIDUAL']
+      roles:['INDIVIDUAL','OFFICE_HEAD']
     },
     icon:'person',
     visible:true,
   },
+  ///MyOffice
   {
     path: '/myOffice',
     component: () => import('pages/TestPages.vue'),
@@ -62,6 +66,7 @@ const routes = [
       },
     ],
   },
+  ////PMT
   {
     path: '/PMT',
     component: () => import('pages/sysAdmin/SysAdmin.vue'),
@@ -101,6 +106,7 @@ const routes = [
       },
     ],
   },
+  ////HR
   {
     path: '/HR',
     component: () => import('pages/sysAdmin/SysAdmin.vue'),
@@ -122,7 +128,7 @@ const routes = [
       },
       {
         path: '/employees',
-        component: () => import('pages/sysAdmin/UserMgt.vue'),
+        component: () => import('pages/HR/EmployeeMgt.vue'),
         meta:{
           title:'Employees',
         },
@@ -131,6 +137,7 @@ const routes = [
       },
     ],
   },  
+  ///SysAdmin
   {
     path: '/sysadm',
     component: () => import('pages/sysAdmin/SysAdmin.vue'),
@@ -174,7 +181,9 @@ const routes = [
     },
     icon:'error',
     visible:false,
-  },  
+  }, 
+  
+  ///Sign In
   {
     path: '/signIn',
     name:'signIn',
