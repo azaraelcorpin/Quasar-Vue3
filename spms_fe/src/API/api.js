@@ -404,83 +404,74 @@ export default {
       }
     },      
 
-    // ///// new Employee
-    // async newEmployee(param) {
-    //   var url = api_url+'/employee/new'
-    //   const config = await this.getAuthorization();
-    //   const body = {
-    //     lname
-    //     fname
-    //     mname
-    //     email
-    //     position
-    //     officeId
-    //     pcrType
-    //     status
-    //     }
-    //   try {      
-    //     const response = await axios.post(url, body, config);
-    //     if (response && response.data && response.status == 200) {
-    //       return response.data;
-    //     } else{
-    //       console.log('newEmployee Error');
-    //       return {error:response}
-    //     }
-    //   } catch (error) {
-    //     console.log(error.response);
-    //     return { error: error.response }
-    //   }
-    // },  
+    ///// new Employee
+    async newEmployee(param) {
+      var url = api_url+'/employee/new'
+      const config = await this.getAuthorization();
+      const body = {
+        lname:param.lname,
+        fname:param.fname,
+        mname:param.mname,
+        email:param.email,
+        }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('newEmployee Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },  
 
-    // //// update Employee
-    // async updateEmployee(param) {
-    //   var url = api_url+'/employee/update'
-    //   const config = await this.getAuthorization();
-    //   const body = {
-    //     lname:param.lname,
-    //     fname:param.fname,
-    //     mname:param.mname,
-    //     email:param.email,
-    //     position:param.position,
-        
-    //     officeId:param.officeId,
-    //     pcrType:param.pcrType,
-    //     status:param.status,
-    //     }
-    //   try {      
-    //     const response = await axios.post(url, body, config);
-    //     if (response && response.data && response.status == 200) {
-    //       return response.data;
-    //     } else{
-    //       console.log('Update Employee Error');
-    //       return {error:response}
-    //     }
-    //   } catch (error) {
-    //     console.log(error.response);
-    //     return { error: error.response }
-    //   }
-    // },      
+    //// update Employee
+    async updateEmployee(param) {
+      var url = api_url+'/employee/update'
+      const config = await this.getAuthorization();
+      const body = {
+        lname:param.lname,
+        fname:param.fname,
+        mname:param.mname,
+        email:param.email,
+        }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('Update Employee Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },      
 
-    //     ///// Delete Employee
-    // async deleteEmployee(param) {
-    //   var url = api_url+'/employee/delete'
-    //   const config = await this.getAuthorization();
-    //   const body = {
-    //     email:param.email,
-    //     }
-    //   try {      
-    //     const response = await axios.post(url, body, config);
-    //     if (response && response.data && response.status == 200) {
-    //       return response.data;
-    //     } else{
-    //       console.log('DelEmployee Error');
-    //       return {error:response}
-    //     }
-    //   } catch (error) {
-    //     console.log(error.response);
-    //     return { error: error.response }
-    //   }
-    // },  
+        ///// Delete Employee
+    async deleteEmployee(param) {
+      var url = api_url+'/employee/delete'
+      const config = await this.getAuthorization();
+      const body = {
+        id:param.id,
+        }
+      try {      
+        const response = await axios.post(url, body, config);
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log('DelEmployee Error');
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        return { error: error.response }
+      }
+    },  
 
     ///// getAllEmployee 
     async getAllEmployee() {

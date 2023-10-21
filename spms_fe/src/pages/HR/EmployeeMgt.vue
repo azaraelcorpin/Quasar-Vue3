@@ -15,9 +15,9 @@
         <q-card-section class="container--fluid" style="height: 89vh;">
           <div class="text-h4">Employee Management </div>
           <!-- new Employee dialog -->
-          <q-dialog v-model="newUserDialog" persistent >
+          <q-dialog v-model="newEmployeeDialog" persistent >
             <q-card  :style="{ width: $q.screen.xs ? '100%' : '50%' }" >   
-              <q-form @submit="newUser" @reset="newUserReset">
+              <q-form @submit="newEmployee" @reset="newEmployeeReset">
                 <q-inner-loading :showing="loading"
                 label="Updating Record..."
                 label-class="text-black"
@@ -27,7 +27,44 @@
                 >
               </q-inner-loading>
                 <q-page-container style="padding:10px;" >                
-                  <div class="text-h5" style="margin: 5px;">{{!NEW_EMPLOYEE.email_old?'New ':'Update '}} Employee</div> 
+                  <div class="text-h5" style="margin: 5px;">{{!NEW_EMPLOYEE.id?'New ':'Update '}} Employee</div> 
+                  <!-- lname -->
+                  <q-input 
+                    required 
+                    label="Lastname" 
+                    dense 
+                    outlined 
+                    class="q-pa-sm" 
+                    color="primary" 
+                    v-model="NEW_EMPLOYEE.lname"
+                    :rules="[rules.noSpaceStart,rules.requiredField]"
+                    >
+                  </q-input> 
+                  <!-- fname -->
+                  <q-input 
+                    required 
+                    label="Firstname" 
+                    dense 
+                    outlined 
+                    class="q-pa-sm" 
+                    color="primary" 
+                    v-model="NEW_EMPLOYEE.fname"
+                    :rules="[rules.noSpaceStart,rules.requiredField]"
+                    >
+                  </q-input>  
+                  <!-- mname -->
+                  <q-input 
+                    required 
+                    label="Middlename" 
+                    dense 
+                    outlined 
+                    class="q-pa-sm" 
+                    color="primary" 
+                    v-model="NEW_EMPLOYEE.mname"
+                    :rules="[rules.noSpaceStartButAllowNullOrEmpty]"
+                    >
+                  </q-input>  
+                  <!-- email -->
                   <q-input 
                     required 
                     label="Email" 
@@ -41,59 +78,7 @@
                     <template v-slot:prepend>
                       <q-icon name="email" />
                     </template>
-                  </q-input>   
-
-                  <q-input 
-                    label="Fullname" 
-                    dense 
-                    outlined 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_EMPLOYEE.employeeName"
-                    :rules="[rules.requiredField,rules.notEmpty,rules.noSpaceStart]"
-                    >
-                    <template v-slot:prepend>
-                      <q-icon name="person_outline" />
-                    </template>
-                  </q-input>  
-
-                  <!-- OFFICE_HEAD is excluded from selection, 
-                      OFFICE_HEAD is at employee.position table
-                  -->
-                  <q-select 
-                    outlined  
-                     :options="['ADMIN','PMT','HR','OFFICE_STAFF']" 
-                    label="Employee Type" 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_EMPLOYEE.employeeType"
-                    :rules="[rules.requiredField]"
-                    >
-                    <template v-slot:prepend>
-                      <q-icon name="assignment_ind" />
-                    </template>
-                  </q-select>
-
-                  <q-select 
-                    v-if="NEW_EMPLOYEE.employeeType === 'OFFICE_STAFF'"
-                    outlined  
-                    :options="offices" 
-                    option-label="code"
-                    label="Office" 
-                    class="q-pa-sm" 
-                    color="primary"  
-                    v-model="NEW_EMPLOYEE.officeId"
-                    :rules="[rules.requiredField]"
-                    >
-                    <template v-slot:prepend>
-                      <q-icon name="assignment" />
-                    </template>                
-                  </q-select>
-
-                  <div class="q-gutter-sm" v-if="NEW_EMPLOYEE.email_old">
-                    <q-radio v-model="NEW_EMPLOYEE.status" val="Active" label="Active" />
-                    <q-radio v-model="NEW_EMPLOYEE.status" val="Inactive" label="Inactive" />
-                  </div>
+                  </q-input>    
                   <div style="display: flex; justify-content: flex-end;">
                     <q-btn class="q-ma-md" color="primary" v-if="NEW_EMPLOYEE.email_old" type="submit">Update</q-btn>
                     <q-btn class="q-ma-md" color="primary" v-else type="submit">Save</q-btn>
@@ -120,7 +105,7 @@
               <template v-slot:body-cell="props">
                 <q-td
                   :props="props"
-                  :class="(props.row.status =='Inactive')?'text-red':'text-black'"
+                  :class="(props.row.position)?'text-black':'text-red'"
                 >
                   {{props.value}}
                 </q-td>
@@ -129,12 +114,12 @@
               <template v-slot:body-cell-action="props">
                 <q-td :props="props" 
                   :class="(props.row.status =='Inactive')?'text-red':'text-black'">
-                  <q-btn color="positive" icon="edit" round flat @click="showUpdateUserDialog(props.row)"></q-btn>
-                  <q-btn color="negative" icon="delete" round flat @click="deleteUser(props.row)"></q-btn>
+                  <q-btn color="positive" icon="edit" round flat @click="showUpdateEmployeeDialog(props.row)"></q-btn>
+                  <q-btn color="negative" icon="delete" round flat @click="deleteEmployee(props.row)"></q-btn>
                 </q-td>
               </template>   
               <template v-slot:top>
-                <q-btn push color="primary" @click=" newUserReset(), newUserDialog = !newUserDialog">New Employee</q-btn>
+                <q-btn push color="primary" @click=" newEmployeeReset(), newEmployeeDialog = !newEmployeeDialog">New Employee</q-btn>
                   <q-space />
                   <q-input dense debounce="300" color="primary" v-model="filter" placeholder="Search">
                     <template v-slot:append>
@@ -161,8 +146,8 @@
                         >{{col.value}}
                         </q-chip>
                         <div v-else-if="col.name === 'action'"  class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
-                          <q-btn color="positive" icon="edit" round flat @click="showUpdateUserDialog(props.row)"></q-btn>
-                          <q-btn color="negative" icon="delete" round flat @click="deleteUser(props.row)"></q-btn>
+                          <q-btn color="positive" icon="edit" round flat @click="showUpdateEmployeeDialog(props.row)"></q-btn>
+                          <q-btn color="negative" icon="delete" round flat @click="deleteEmployee(props.row)"></q-btn>
                         </div>
                         <q-item-label v-else caption :class="col.classes ? col.classes : ''">{{ col.value }}</q-item-label>
                       </q-item-section>
@@ -201,18 +186,6 @@
 
       },
 
-      async queryOffices(){
-        try {
-          this.loading = true;
-          let response = await api.getAllOffice();
-          console.log('getOffices', response.message)
-          this.offices = response.OFFICES;
-        } catch (error) {
-          console.log('error',error)
-        }
-        this.loading = false;
-      },
-
       async queryEmployeeList(){
         try {
           this.loading = true;
@@ -225,21 +198,21 @@
         this.loading = false;
       },
 
-      async newUser(){
+      async newEmployee(){
         if(this.NEW_EMPLOYEE.email_old){
-          this.updateUser()
+          this.updateEmployee()
         }else{
           try {
             this.loading = true;
             console.log(this.NEW_EMPLOYEE);
-            let response = await api.newUser(this.NEW_EMPLOYEE);
-            console.log('newUser',response)          
+            let response = await api.newEmployee(this.NEW_EMPLOYEE);
+            console.log('newEmployee',response)          
             if(response.error){
               dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
             }else{
               dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-                this.newUserReset();
-                this.queryUserList();
+                this.newEmployeeReset();
+                this.queryEmployeeList();
               }) ;
             }
             
@@ -250,26 +223,26 @@
         }
       },
 
-      async updateUser(){
+      async updateEmployee(){
         try {
           
           dialog.confirm(this.$q,"Confirmation","Would you like to update this employee?")
           .onOk(async() => {
               this.loading = true;
-              let response = await api.updateUser(this.NEW_EMPLOYEE);
-              console.log('updateUser',response)      
+              let response = await api.updateEmployee(this.NEW_EMPLOYEE);
+              console.log('updateEmployee',response)      
               if(response.error){
                 dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
               }else{
                 this.loading = false; 
                 dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-                  // this.queryUserList();
+                  // this.queryEmployeeList();
                   this.testObj.email = this.NEW_EMPLOYEE.email
                   this.testObj.employeename = this.NEW_EMPLOYEE.employeeName
                   this.testObj.office = this.NEW_EMPLOYEE.employeeType === 'OFFICE_STAFF'?this.NEW_EMPLOYEE.officeId.code:null
                   this.testObj.employee_type = this.NEW_EMPLOYEE.employeeType
                   this.testObj.status = this.NEW_EMPLOYEE.status
-                  this.newUserReset();
+                  this.newEmployeeReset();
                 }) ;
               }     
               this.loading = false;                                      
@@ -280,19 +253,19 @@
         this.loading = false;
       },      
 
-      async deleteUser(param){
+      async deleteEmployee(param){
         try {
 
           dialog.confirm(this.$q,"Confirmation","Would you like to delete "+param.email+"?")
           .onOk(async() => {
               this.loading = true;
-              let response = await api.deleteUser(param);
-              console.log('deleteUser',response)          
+              let response = await api.deleteEmployee(param);
+              console.log('deleteEmployee',response)          
               if(response.error){
                 dialog.negative(this.$q,response.error.data.status,response.error.data.message)           
               }else{
                 dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-                  this.queryUserList();
+                  this.queryEmployeeList();
                 }) ;
               }
               this.loading = false;
@@ -307,28 +280,27 @@
         this.loading = false;
       },
 
-      showUpdateUserDialog(row){
+      showUpdateEmployeeDialog(row){
         this.testObj = row;
         let tmp = {...row};
         this.NEW_EMPLOYEE.email = tmp.email;
         this.NEW_EMPLOYEE.employeeName = tmp.employeename;
         this.NEW_EMPLOYEE.employeeType = tmp.employee_type;
-        this.NEW_EMPLOYEE.officeId = this.offices.find((office)=> office.id === tmp.office_id);
         this.NEW_EMPLOYEE.email_old = tmp.email;
         this.NEW_EMPLOYEE.status = tmp.status;
-        this.newUserDialog = true;
+        this.newEmployeeDialog = true;
       },
 
-      newUserReset(){
+      newEmployeeReset(){
         this.NEW_EMPLOYEE={
+              id:null,
               email:null,
-              employeeName:null,
-              employeeType:null,
-              officeId:null,
-              email_old:null,
-              status:null,
+              lname:null,
+              fname:null,
+              mname:null,
+              email:null,
             }
-            this.newUserDialog = false;
+            this.newEmployeeDialog = false;
       }
     },
     data(){
@@ -336,11 +308,12 @@
         testObj:{},
         filter:"",
         loading:false,
-        newUserDialog:false,
+        newEmployeeDialog:false,
         rules: {
                 noSpace: v => (!v?.includes(' ')) || "No space allowed.",
                 notEmpty:(v) => (v && v.replaceAll(' ','').length > 0) ||  "Empty Value.",
                 noSpaceStart:(v) => (v && v.charAt(0) != ' ') || "No space allowed at start",
+                noSpaceStartButAllowNullOrEmpty:(v) => (v === null || (v??'').length === 0 ) || (v && v.charAt(0) != ' ') || "No space allowed at start",
                 requiredField: v => !!v || "Required field.", 
                 requiredSelection: v => !!v || "Required at least one selection",
                 properEmail: v => !v || /^\w+([.-]?\w+)*@msugensan\.edu\.ph$/.test(v) ||  'E-mail must be valid. Ex. juandelacruz@msugensan.edu.ph',
@@ -352,15 +325,14 @@
                 // float: (v) => ((!isNaN(this.StringToNumber(v)) && this.StringToNumber(v).indexOf('.') != -1) || (!isNaN(this.StringToNumber(v)) && /^[0-9]*$/.test(this.StringToNumber(v)))) || "Must be a number"
                 ///^(09|\+639)\d{9}$/ <- if needed full philippine mobile number 
             },
-            NEW_EMPLOYEE:{
-              email:null,
-              employeeName:null,
-              employeeType:null,
-              officeId:null,
-              email_old:null,
-              status:null,
-            },
-        offices:[],
+        NEW_EMPLOYEE:{
+          id:null,
+          email:null,
+          lname:null,
+          fname:null,
+          mname:null,
+          email:null,
+        },
         header : [
             {
               name: 'email',
@@ -370,31 +342,18 @@
               sortable: true
             },
             {
-              name: 'employeeName',
+              name: 'fullname',
               label: 'Fullname',
               align: 'left',
-              field: 'employeename',
+              field: 'fullname',
               sortable: true
             },
             {
-              name: 'employeeType',
-              label: 'Employee Type',
+              name: 'position',
+              label: 'Office - Position',
               align: 'left',
-              field: 'employee_type',
-              sortable: true
-            },
-            {
-              name: 'office',
-              label: 'Office',
-              align: 'left',
-              field: 'office',
-              sortable: true
-            },
-            {
-              name: 'status',
-              label: 'Status',
-              align: 'left',
-              field: 'status',
+              field: 'position',
+              format: (value) => { return value??'Inactive';},
               sortable: true
             },
             {
@@ -407,8 +366,7 @@
       };
     },
     mounted(){
-      this.queryOffices();
-      this.queryUserList();
+      this.queryEmployeeList();
     }
   })
   </script>
