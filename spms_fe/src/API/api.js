@@ -433,6 +433,7 @@ export default {
       var url = api_url+'/employee/update'
       const config = await this.getAuthorization();
       const body = {
+        id:param.id, 
         lname:param.lname,
         fname:param.fname,
         mname:param.mname,

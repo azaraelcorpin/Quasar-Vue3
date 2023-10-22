@@ -54,7 +54,6 @@
                   </q-input>  
                   <!-- mname -->
                   <q-input 
-                    required 
                     label="Middlename" 
                     dense 
                     outlined 
@@ -78,9 +77,10 @@
                     <template v-slot:prepend>
                       <q-icon name="email" />
                     </template>
-                  </q-input>    
+                  </q-input> 
+
                   <div style="display: flex; justify-content: flex-end;">
-                    <q-btn class="q-ma-md" color="primary" v-if="NEW_EMPLOYEE.email_old" type="submit">Update</q-btn>
+                    <q-btn class="q-ma-md" color="primary" v-if="NEW_EMPLOYEE.id" type="submit">Update</q-btn>
                     <q-btn class="q-ma-md" color="primary" v-else type="submit">Save</q-btn>
                     <q-btn class="q-ma-md" type="reset">Cancel</q-btn>
                   </div>
@@ -199,7 +199,7 @@
       },
 
       async newEmployee(){
-        if(this.NEW_EMPLOYEE.email_old){
+        if(this.NEW_EMPLOYEE.id){
           this.updateEmployee()
         }else{
           try {
@@ -236,12 +236,7 @@
               }else{
                 this.loading = false; 
                 dialog.positive(this.$q,response.status,response.message).onOk(()=>{
-                  // this.queryEmployeeList();
-                  this.testObj.email = this.NEW_EMPLOYEE.email
-                  this.testObj.employeename = this.NEW_EMPLOYEE.employeeName
-                  this.testObj.office = this.NEW_EMPLOYEE.employeeType === 'OFFICE_STAFF'?this.NEW_EMPLOYEE.officeId.code:null
-                  this.testObj.employee_type = this.NEW_EMPLOYEE.employeeType
-                  this.testObj.status = this.NEW_EMPLOYEE.status
+                  this.queryEmployeeList();
                   this.newEmployeeReset();
                 }) ;
               }     
@@ -283,11 +278,12 @@
       showUpdateEmployeeDialog(row){
         this.testObj = row;
         let tmp = {...row};
+        console.log('tmp',tmp)
         this.NEW_EMPLOYEE.email = tmp.email;
-        this.NEW_EMPLOYEE.employeeName = tmp.employeename;
-        this.NEW_EMPLOYEE.employeeType = tmp.employee_type;
-        this.NEW_EMPLOYEE.email_old = tmp.email;
-        this.NEW_EMPLOYEE.status = tmp.status;
+        this.NEW_EMPLOYEE.lname = tmp.lName;
+        this.NEW_EMPLOYEE.fname = tmp.fName;
+        this.NEW_EMPLOYEE.mname = tmp.mName;
+        this.NEW_EMPLOYEE.id = tmp.id
         this.newEmployeeDialog = true;
       },
 

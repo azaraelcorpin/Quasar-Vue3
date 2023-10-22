@@ -1,7 +1,5 @@
 <template>
-  <div>
-    <router-view v-if="$route.matched.length >= 3" />
-    <q-page v-else class="q-pa-sm">
+    <q-page class="q-pa-sm">
       <q-inner-loading :showing="loading" style="z-index: 1000;" >
         <q-spinner-gears size="90px" color="primary"/>
       </q-inner-loading>
@@ -15,7 +13,7 @@
       <q-card class="pa-1">      
 
         <q-card-section class="container--fluid" >
-          <div class="text-h4">Office Management </div>
+          <div class="text-h4">Office Details </div>
         <q-card style="height:80vh;">
         <q-tabs 
           v-model="tab"
@@ -202,7 +200,6 @@
       </q-card-section>
     </q-card>
     </q-page>
-  </div>
   </template>
   
   <script>
@@ -214,7 +211,7 @@
   import 'vue3-blocks-tree/dist/vue3-blocks-tree.css';
   
   export default defineComponent({
-    name: 'OfficeMgt',
+    name: 'OfficeDetails',
     components: {
       BlocksTree
     },

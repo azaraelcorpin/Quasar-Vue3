@@ -109,7 +109,7 @@ const routes = [
   ////HR
   {
     path: '/HR',
-    component: () => import('pages/sysAdmin/SysAdmin.vue'),
+    component: () => import('pages/HR/HumanResource.vue'),
     meta:{
       title:'Human Resource',
       roles:['HR']
@@ -125,6 +125,16 @@ const routes = [
         },
         icon:'holiday_village',
         visible:true,
+        children:[
+          {
+            path: '/offices/:id',
+            component: () => import('pages/HR/OfficeDetails.vue'),
+            meta:{
+              title:'Office Details',
+            },
+            visible:false,            
+          }
+        ]
       },
       {
         path: '/employees',
