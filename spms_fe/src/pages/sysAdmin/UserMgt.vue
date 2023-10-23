@@ -11,6 +11,7 @@
       <!-- test button -->
 
       <q-card class="pa-1">      
+        <q-btn @click="$router.push({name:'office',params:{id:12}})">asdasd</q-btn>
 
         <q-card-section class="container--fluid" style="height: 89vh;">
           <div class="text-h4">User Management </div>

@@ -115,7 +115,7 @@
                 <q-td :props="props" 
                   :class="(props.row.status =='Inactive')?'text-red':'text-black'">
                   <q-btn color="positive" icon="edit" round flat @click="showUpdateEmployeeDialog(props.row)"></q-btn>
-                  <q-btn color="negative" icon="delete" round flat @click="deleteEmployee(props.row)"></q-btn>
+                  <q-btn color="negative" icon="delete" round flat :disabled="props.row.position" @click="deleteEmployee(props.row)"></q-btn>
                 </q-td>
               </template>   
               <template v-slot:top>

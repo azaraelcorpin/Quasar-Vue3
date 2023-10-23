@@ -27,6 +27,7 @@ const routes = [
   ///MyPCR
   {
     path: '/myPCR',
+    name:'myPCR',
     component: () => import('pages/TreeSample.vue'),
     meta:{
       title:'My PCR',
@@ -38,6 +39,7 @@ const routes = [
   ///MyOffice
   {
     path: '/myOffice',
+    name:'myOffice',
     component: () => import('pages/TestPages.vue'),
     meta:{
       title:'My Office',
@@ -69,6 +71,7 @@ const routes = [
   ////PMT
   {
     path: '/PMT',
+    name:'PMT',
     component: () => import('pages/sysAdmin/SysAdmin.vue'),
     meta:{
       title:'PMT',
@@ -109,6 +112,7 @@ const routes = [
   ////HR
   {
     path: '/HR',
+    name:'HR',
     component: () => import('pages/HR/HumanResource.vue'),
     meta:{
       title:'Human Resource',
@@ -119,6 +123,7 @@ const routes = [
     children:[
       {
         path: '/offices',
+        name:'offices',
         component: () => import('pages/HR/OfficesMgt.vue'),
         meta:{
           title:'Office',
@@ -128,9 +133,11 @@ const routes = [
         children:[
           {
             path: '/offices/:id',
+            name:'office',
             component: () => import('pages/HR/OfficeDetails.vue'),
             meta:{
               title:'Office Details',
+              roles:['HR','OFFICE_HEAD','OFFICE_STAFF']
             },
             visible:false,            
           }

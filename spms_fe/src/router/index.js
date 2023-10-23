@@ -31,18 +31,20 @@ function checkRoles(to, from, next) {
     // Check if the user has the required role
     // next(false);
     const userRoles = JSON.parse(localStorage.getItem('userRoles')); // Assuming you store user roles in localstorage
-    const hasRequiredRole =userRoles?requiredRoles.some(role => userRoles.includes(role)):null;
+    const hasRequiredRole =userRoles?requiredRoles.find(role => userRoles.includes(role)):null;
+    alert(hasRequiredRole)
     const ImDev = localStorage.getItem('ImDev');
     if (hasRequiredRole || ImDev) {
       // User has the required role, allow access to the route
       next();
     } else {
       // User does not have the required role, deny access or redirect to an access denied page
+      const requiredRolesFrom = from.meta.roles;
       const $q = useQuasar();
         myDialog.negative($q,"Forbidden","Access Denied on "+to.meta.title).onOk(()=>{
-          let prevRouteRole = userRoles?requiredRoles.some(role => userRoles.includes(role)):null;
+          let prevRouteRole = userRoles?(requiredRolesFrom??[]).some(role => userRoles.includes(role)):null;
           if(prevRouteRole)
-            next(false);
+            next(from);
           else
             next({name:'dashboard'})
         }) ;      
