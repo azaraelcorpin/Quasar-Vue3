@@ -138,7 +138,7 @@
                 >
                   <template v-slot:body-cell-action="props">
                     <q-td :props="props">
-                      <q-btn color="info" icon="search" round flat @click="dialog.info($q,'show','Details')"></q-btn>
+                      <q-btn color="positive" icon="launch" round flat @click="$router.push({name:'office',params:{id:props.row.id}})"></q-btn>
                       <q-btn color="positive" icon="edit" round flat @click="showUpdateOfficeDialog(props.row)"></q-btn>
                       <q-btn color="negative" icon="delete" :disabled="hasSubOffice(props.row)" round flat @click="deleteOffice(props.row)"></q-btn>
                     </q-td>
@@ -171,6 +171,7 @@
                             >{{col.value}}
                             </q-chip>
                             <div v-else-if="col.name === 'action'"  class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+                              <q-btn color="positive" icon="launch" round flat @click="dialog.info($q,'show','Details')"></q-btn>
                               <q-btn color="positive" icon="edit" round flat @click="showUpdateOfficeDialog(props.row)"></q-btn>
                               <q-btn color="negative" icon="delete" round flat :disabled="hasSubOffice(props.row)" @click="deleteOffice(props.row)"></q-btn>
                             </div>
@@ -485,6 +486,7 @@
       };
     },
     mounted(){
+      // if(this.$route.name === 'offices')
       this.queryOfficeList();
     },
   })

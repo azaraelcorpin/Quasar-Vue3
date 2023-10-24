@@ -26,13 +26,13 @@ function handleRouteNavigationAndTitleChange(to, from, next) {
 // Define the function to check user roles
 function checkRoles(to, from, next) {
   const requiredRoles = to.meta.roles;
+  to.meta.from = from
   // Check if the route has required roles defined in its meta property
   if (requiredRoles && requiredRoles.length > 0) {
     // Check if the user has the required role
     // next(false);
     const userRoles = JSON.parse(localStorage.getItem('userRoles')); // Assuming you store user roles in localstorage
     const hasRequiredRole =userRoles?requiredRoles.find(role => userRoles.includes(role)):null;
-    alert(hasRequiredRole)
     const ImDev = localStorage.getItem('ImDev');
     if (hasRequiredRole || ImDev) {
       // User has the required role, allow access to the route

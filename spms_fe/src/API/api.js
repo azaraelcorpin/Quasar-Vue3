@@ -220,7 +220,29 @@ export default {
         this.validateResponse(error)
         return { error: error.response }??error
       }
-    },    
+    },   
+    
+    ///// getOfficeData
+    async getOfficeData(id) {
+      var url = api_url+'/office/getOfficeData'
+      const config = await this.getAuthorization();
+      const body = { 
+        id:id
+      }
+      try {      
+        const response = await axios.post(url, body, config);      
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log(response);
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error);
+        this.validateResponse(error)
+        return { error: error.response }??error
+      }
+    },  
 
     ///// new User
     async newOffice(param) {
