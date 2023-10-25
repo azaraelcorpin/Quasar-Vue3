@@ -25,13 +25,15 @@
         </q-btn>
         <q-btn   padding="0" round >
           <q-avatar size="40px" v-if="$route.name !== 'signIn'" >
-                  <img :src="profilePicture()">
+                  <img v-if="cookies.isKey('_UID_') && cookies.get('_UID_').picture" :src="profilePicture()">
+                  <q-icon name="person"/>
           </q-avatar>
           <q-menu>
             <div class="row no-wrap q-pa-md">
               <div class="column items-center">
                 <q-avatar size="72px">
-                  <img :src="profilePicture()">
+                  <img v-if="cookies.isKey('_UID_') && cookies.get('_UID_').picture" :src="profilePicture()">
+                  <q-icon name="person"/>
                 </q-avatar>
                 <div class="text-subtitle1 q-mt-md q-mb-xs">{{ cookies.isKey('_UID_')?cookies.get('_UID_').name:'Un Identified' }}</div>
                 <div >{{ cookies.isKey('_UID_')?cookies.get('_UID_').userEmail:'Un Identefied' }}</div>
@@ -58,6 +60,17 @@
         </q-toolbar>
         
       </q-footer>
+
+      <!-- This Configuration for Drawer with no mini state and not over lay -->
+      <!-- <q-drawer
+      v-model="leftDrawerOpen"
+      show-if-above
+      
+      :width="250"
+      :breakpoint="500"
+      bordered
+      class="drawer-with-bg"
+    >       -->
 
     <q-drawer
       v-model="leftDrawerOpen"

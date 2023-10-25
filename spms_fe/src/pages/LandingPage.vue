@@ -13,7 +13,10 @@
       <div  style="position: absolute;margin-bottom: 30%;  font-size: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold; color: black;">
       Strategic Performance Monitoring System
     </div>
-    <GoogleLogin clientId="247346265934-ksi885k87vtrcqh7tvmcgeca9fvqr0fd.apps.googleusercontent.com" :callback="callback"/>
+    <GoogleLogin v-if="false" clientId="247346265934-ksi885k87vtrcqh7tvmcgeca9fvqr0fd.apps.googleusercontent.com" :callback="callback"/>
+    <q-btn @click="test">
+      TEST
+    </q-btn>
   </div>
 </template>
 
@@ -87,9 +90,56 @@ export default{
                 }
               }
           };
+          const test = async () => {
+            // This callback will be triggered when the user selects or login to
+            // his Google account from the popup
+            loading.value=true;
+            let SID = {};
+            SID.userEmail = 'azarael.corpin@msugensan.edu.ph';
+            SID.name = 'Azarael Hashem P. Corpin';
+            SID.picture = null;    
+            console.log(!SID.userEmail.includes('@msugensan.edu.ph'))
+            if(!SID.userEmail.includes('@msugensan.edu.ph'))
+              {
+                myDialog.negative($q,'Unauthorized','Account Not Found')
+                loading.value=false;
+              }
+              else{
+                try {         
+                  let response = await api.generateSessionId(SID);   
+                  console.log('reso',response)              
+                  if(response.error){
+                    if(response.error.response)
+                    throw new Error(response.error.response.data.message);
+                    throw new Error(response.error.message);
+                  }
+                  if(response.status === 'OK'){
+                      let sid=response.session.sessionId;
+                      SID.sid=sid
+                      cookies.set('_UID_',JSON.stringify(SID),'1d'); 
+                      // put in localStorage the userRoles from response ↓↓↓
+                      // localStorage.clear();
+                      // localStorage.setItem("userRoles",JSON.stringify('[DEV]'))    
+
+                      localStorage.clear();
+                      localStorage.setItem("userRoles",JSON.stringify(response.session.ROLES))    
+                      localStorage.setItem("officesAndRoles",JSON.stringify(response.session.officesAndRoles))                
+                  }
+                      router.push({ path: 'dashboard'})
+                      loading.value=false;
+                      window.location.reload();
+                } catch (error) { 
+                  console.log('reso',error) 
+                  loading.value=false;
+                  myDialog.negative($q,'Error',error.message)
+
+                }
+              }
+          }
           
     return{
         callback,
+        test,
         router,
         cookies ,
         loading,

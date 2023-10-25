@@ -95,7 +95,6 @@
               </q-table>
             </div>
         </q-card-section> 
-        {{ $route.meta.roles }}
       </q-card>
   </q-page> 
   
@@ -115,6 +114,7 @@ export default defineComponent({
   },
   data(){
     return{
+      filter:"",
       loading:true,
       UserType:null,
       OFFICE_INFO:{},

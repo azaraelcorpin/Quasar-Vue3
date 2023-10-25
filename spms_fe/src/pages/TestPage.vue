@@ -22,38 +22,38 @@ export default defineComponent({
       treeData: 
          {
           name: 'root',
-          image_url:  "https://lh3.googleusercontent.com/a/ACg8ocJCM1-oXNBMNh1LLPHTAKtQgIL7jsJwovvgdes2Zn2hyg=s96-c",
+          image_url:  "src/assets/MSU_Gensan_logo.png",
           class: ["rootNode"],
           children: [
             {
               name: 'children1',
-              image_url: ( '../assets/MSU_Gensan_logo.png')
+              image_url: ( 'src/assets/MSU_Gensan_logo.png')
             },
             {
               name: 'children2',
-              image_url: ( '../assets/MSU_Gensan_logo.png'),
+              image_url: ( 'src/assets/MSU_Gensan_logo.png'),
               mate: [{
                 name: 'mate',
-                image_url: ( '../assets/MSU_Gensan_logo.png')
+                image_url: ( 'src/assets/MSU_Gensan_logo.png')
               }],
               children: [
                 {
                   name: 'grandchild',
-                  image_url:( '../assets/MSU_Gensan_logo.png')
+                  image_url:( 'src/assets/MSU_Gensan_logo.png')
                 },
                 {
                   name: 'grandchild2',
-                  image_url:( '../assets/MSU_Gensan_logo.png')
+                  image_url:( 'src/assets/MSU_Gensan_logo.png')
                 },
                 {
                   name: 'grandchild3',
-                  image_url: ( '../assets/MSU_Gensan_logo.png')
+                  image_url: ( 'src/assets/MSU_Gensan_logo.png')
                 }
               ]
             },
             {
               name: 'children3',
-              image_url: ( '../assets/MSU_Gensan_logo.png')
+              image_url: ( 'src/assets/MSU_Gensan_logo.png')
             }
           ]
         }
