@@ -9,14 +9,28 @@
        style="z-index: 1000;" >
       </q-inner-loading>
     <div style=" align-items: center; justify-content: center;position: absolute; top: 20px; font-size: 48px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold; color: black;">
-      Mindanao State University</div>
+      Mindanao State University
+    </div>
       <div  style="position: absolute;margin-bottom: 30%;  font-size: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: bold; color: black;">
       Strategic Performance Monitoring System
-    </div>
-    <GoogleLogin v-if="false" clientId="247346265934-ksi885k87vtrcqh7tvmcgeca9fvqr0fd.apps.googleusercontent.com" :callback="callback"/>
-    <q-btn @click="test">
-      TEST
-    </q-btn>
+      </div>
+      <div  style="position: absolute;margin-bottom: -30%;" >
+        <q-btn @click="test('hr@msugensan.edu.ph')">
+          test HR
+        </q-btn>
+        <q-btn @click="test('admin@msugensan.edu.ph')">
+          test ADMIN
+        </q-btn>     
+        <q-btn @click="test('office_staff@msugensan.edu.ph')">
+          test office Staff
+        </q-btn>             
+        <q-btn @click="test('pmt@msugensan.edu.ph')">
+          test PMT
+        </q-btn>         
+      </div>      
+    
+    <GoogleLogin clientId="247346265934-ksi885k87vtrcqh7tvmcgeca9fvqr0fd.apps.googleusercontent.com" :callback="callback"/>
+
   </div>
 </template>
 
@@ -46,6 +60,7 @@ export default{
           const callback = async (response) => {
             // This callback will be triggered when the user selects or login to
             // his Google account from the popup
+            console.log('gmail',response)
             loading.value=true;
             const userData = decodeCredential(response.credential)
             let SID = {};
@@ -90,13 +105,13 @@ export default{
                 }
               }
           };
-          const test = async () => {
+          const test = async (email) => {
             // This callback will be triggered when the user selects or login to
             // his Google account from the popup
             loading.value=true;
             let SID = {};
-            SID.userEmail = 'azarael.corpin@msugensan.edu.ph';
-            SID.name = 'Azarael Hashem P. Corpin';
+            SID.userEmail = email;
+            SID.name = email.replaceAll('@msugensan.edu.ph','');
             SID.picture = null;    
             console.log(!SID.userEmail.includes('@msugensan.edu.ph'))
             if(!SID.userEmail.includes('@msugensan.edu.ph'))
@@ -122,8 +137,10 @@ export default{
                       // localStorage.setItem("userRoles",JSON.stringify('[DEV]'))    
 
                       localStorage.clear();
-                      localStorage.setItem("userRoles",JSON.stringify(response.session.ROLES))    
-                      localStorage.setItem("officesAndRoles",JSON.stringify(response.session.officesAndRoles))                
+                      localStorage.setItem("userRoles",JSON.stringify(response.session.ROLES))
+                      let tmp = JSON.stringify(response.session.officesAndRoles);
+                      if(tmp)    
+                        localStorage.setItem("officesAndRoles",tmp)                
                   }
                       router.push({ path: 'dashboard'})
                       loading.value=false;

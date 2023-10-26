@@ -111,11 +111,11 @@
               
                 <div v-else>
                   <q-expansion-item  
+                    :model-value="$route.matched.find(x => x.name === item.name)?true:false"
                     :content-inset-level="0.3" 
                     expand-separator 
                     :icon="item.icon" 
                     :label="item.meta.title" 
-                    :default-opened=false
                     :to="item.path"
                     expand-icon-class="text-white"
                     >
@@ -154,7 +154,7 @@
 </template>
 
 <script>
-import { defineComponent, ref, onMounted,onBeforeUnmount} from 'vue'
+import { defineComponent, ref, onMounted,onBeforeUnmount, computed} from 'vue'
 import routes from 'src/router/routes'
 import { useCookies } from "vue3-cookies";
 import { useRouter } from 'vue-router'

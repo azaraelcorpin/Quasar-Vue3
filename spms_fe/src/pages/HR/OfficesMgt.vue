@@ -74,7 +74,7 @@
                       </q-input>                   
                       <q-select 
                         outlined  
-                        :options="[{val:0,desc:'Office'},{val:1,desc:'Sector'}]" 
+                        :options="[{val:false,desc:'Office'},{val:true,desc:'Sector'}]" 
                         option-label="desc"
                         option-value="val"
                         @popup-hide="()=>{
@@ -92,24 +92,24 @@
                         :rules="[rules.requiredField]"
                         >
                       </q-select>
-                      <q-checkbox
+                      <!-- <q-checkbox 
                         right-label
                         v-model="NEW_OFFICE.hasTopOffice"
                         label="Has Top Office"
                         checked-icon="task_alt"
                         unchecked-icon="highlight_off"   
                         :disable="disableHasTopOfficeCheckBox" 
-                      />
-                      <q-select v-if="NEW_OFFICE.hasTopOffice"
+                      /> -->
+                      <q-select 
                         outlined  
-                        :options="Officelist.filter((office)=> office.is_sector === 0  && office.id !== NEW_OFFICE.id)" 
+                        :options="topOfficeFilter" 
                         option-label="code"
                         option-value="id"
                         label="Top Office" 
                         class="q-pa-sm" 
                         color="primary" 
                         v-model="NEW_OFFICE.topOfficeId"
-                        :rules="NEW_OFFICE.is_sector.val===1 || NEW_OFFICE.hasTopOffice?[rules.requiredField]:[]"
+                        :rules="[rules.requiredField]"
                         >
                       </q-select>
 
@@ -139,8 +139,12 @@
                   <template v-slot:body-cell-action="props">
                     <q-td :props="props">
                       <q-btn color="positive" icon="launch" round flat @click="$router.push({name:'office',params:{id:props.row.id}})"></q-btn>
-                      <q-btn color="positive" icon="edit" round flat @click="showUpdateOfficeDialog(props.row)"></q-btn>
-                      <q-btn color="negative" icon="delete" :disabled="hasSubOffice(props.row)" round flat @click="deleteOffice(props.row)"></q-btn>
+                      <q-btn color="positive" icon="edit" :disabled="props.row.code === 'OC'"  round flat @click="showUpdateOfficeDialog(props.row)">
+                        <q-tooltip v-if="props.row.code === 'OC'">Root Office</q-tooltip>
+                      </q-btn>
+                      <q-btn color="negative" icon="delete" :disabled="hasSubOffice(props.row)" round flat @click="deleteOffice(props.row)">
+                        <q-tooltip v-if="hasSubOffice(props.row)">Has Sub Office</q-tooltip>
+                      </q-btn>
                     </q-td>
                   </template>   
                   <template v-slot:top>
@@ -173,7 +177,9 @@
                             <div v-else-if="col.name === 'action'"  class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
                               <q-btn color="positive" icon="launch" round flat @click="dialog.info($q,'show','Details')"></q-btn>
                               <q-btn color="positive" icon="edit" round flat @click="showUpdateOfficeDialog(props.row)"></q-btn>
-                              <q-btn color="negative" icon="delete" round flat :disabled="hasSubOffice(props.row)" @click="deleteOffice(props.row)"></q-btn>
+                              <q-btn color="negative" icon="delete" :disabled="hasSubOffice(props.row)" round flat @click="deleteOffice(props.row)">
+                                <q-tooltip v-if="hasSubOffice(props.row)">Has Sub Office</q-tooltip>
+                              </q-btn>
                             </div>
                             <q-item-label v-else caption :class="col.classes ? col.classes : ''">{{ col.value }}</q-item-label>
                           </q-item-section>
@@ -194,7 +200,8 @@
                 :props="{label: 'code', expand: 'expand', children: 'nodes',  key:'id'}"
           >
                 <template #node="{data}">
-                  <div @click="dialog.info($q,data.code,data.Description)" style="cursor: pointer;">   {{data.code}}</div>
+                  <!-- <div @click="dialog.info($q,data.code,data.Description)" style="cursor: pointer;">   {{data.code}}</div> -->
+                  <div @click="$router.push({name:'office',params:{id:data.id}})" style="cursor: pointer;">   {{data.code}}</div>
               </template>
           </blocks-tree>
           </q-tab-panel>
@@ -391,11 +398,18 @@
                   label: code,
                   id,
                   is_sector,
+                  expand:true,
                   nodes: [],
               };
 
               // Store the office in the map for quick access
               officeMap[id] = node;
+            });
+ 
+            originalData.forEach((office) => {
+             
+              const { Description, code, id, is_sector, top_office, top_office_code } = office;
+              const node = officeMap[id];
 
               // Find the parent office and add this node as its child
               if (top_office && officeMap[top_office]) {
@@ -403,7 +417,8 @@
               } else {
                   transformedData.OFFICES.push(node);
               }
-          });
+            });
+            this.mappedOffice = officeMap;
           this.treeData = transformedData.OFFICES[0]
       },
     },
@@ -434,7 +449,7 @@
           description:null,
           is_sector:{val:0,desc:'Office'},
           topOfficeId:null,
-          hasTopOffice:false,
+          hasTopOffice:true,
         },
         header : [
             {
@@ -482,6 +497,7 @@
           Officelist:[],
           disableHasTopOfficeCheckBox:false,
           treeData:[],
+          mappedOffice:{},
           tab:"table"
       };
     },
@@ -489,6 +505,29 @@
       // if(this.$route.name === 'offices')
       this.queryOfficeList();
     },
+    computed:{
+      topOfficeFilter : function(){
+        if(this.NEW_OFFICE.id === null)
+          return this.Officelist.filter((office)=> office.is_sector === 0 )
+        let tmp = this.Officelist.filter((office)=> office.is_sector === 0  && office.id !== this.NEW_OFFICE.id)
+        let filtered = [];
+        tmp.forEach((tmpOffice) => {
+              let node  = tmpOffice
+              let conflict = false;
+              while(node.top_office){
+                if(node.top_office === this.NEW_OFFICE.id){
+                  conflict = true;
+                  break;
+                }
+                node = tmp.find(item => item.id === node.top_office);
+              }
+              if(!conflict){
+                filtered.push(tmpOffice)
+              }
+            });
+        return filtered;
+      },
+    }
   })
   </script>
   <style>

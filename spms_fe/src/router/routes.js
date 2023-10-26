@@ -157,6 +157,7 @@ const routes = [
   ///SysAdmin
   {
     path: '/sysadm',
+    name:'sysadm',
     component: () => import('pages/sysAdmin/SysAdmin.vue'),
     meta:{
       title:'System Admin',

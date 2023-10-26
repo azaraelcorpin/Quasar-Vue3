@@ -5,8 +5,8 @@
       </q-inner-loading>
 
         <!-- Test button -->
-      <q-btn @click="loading=!loading" style="  position: fixed;right: 1%; z-index: 1000;">
-        loading test
+      <q-btn @click="$router.push({name:'offices'})" style="  position: fixed;right: 1%; z-index: 1000;">
+        Back to Office Management
       </q-btn>
       <!-- test button -->
 
@@ -196,24 +196,24 @@ export default defineComponent({
     /**
      * Checking if the user is authorized to access this office details... checking if user has office id on officesRoles
      */
-     const ImDev = localStorage.getItem('ImDev');
-     if(ImDev){ this.UserType = 'ImDev'; return }    /// if developer pass to all auth
-    this.UserType = null
-     const offices = JSON.parse(localStorage.getItem('officesAndRoles'));    
-    let role = offices?offices.find(item=>(item.office_id+'' === this.$route.params.id && item.role === 'OFFICE_HEAD')):null;
-    role = role??offices.find(item=>(item.office_id === this.$route.params.id && item.role === 'OFFICE_STAFF'))
-    console.log('role',role)
-    if(role)
-    this.UserType = role.role
-    else{
-      dialog.negative(this.$q,"Forbidden","Access Denied on "+this.$route.meta.title).onOk(()=>{
-                if(this.$route.meta.from.name){
-                  this.$router.push(this.$route.meta.from);
-                }
-                else
-                   this.$router.push({name:'dashboard'});
-        }) ; 
-    }
+    //  const ImDev = localStorage.getItem('ImDev');
+    //  if(ImDev){ this.UserType = 'ImDev'; return }    /// if developer pass to all auth
+    // this.UserType = null
+    //  const offices = JSON.parse(localStorage.getItem('officesAndRoles'));    
+    // let role = offices?offices.find(item=>(item.office_id+'' === this.$route.params.id && item.role === 'OFFICE_HEAD')):null;
+    // role = role??offices.find(item=>(item.office_id === this.$route.params.id && item.role === 'OFFICE_STAFF'))
+    // console.log('role',role)
+    // if(role)
+    // this.UserType = role.role
+    // else{
+    //   dialog.negative(this.$q,"Forbidden","Access Denied on "+this.$route.meta.title).onOk(()=>{
+    //             if(this.$route.meta.from.name){
+    //               this.$router.push(this.$route.meta.from);
+    //             }
+    //             else
+    //                this.$router.push({name:'dashboard'});
+    //     }) ; 
+    // }
         
   },
 })
