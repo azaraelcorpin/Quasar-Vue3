@@ -14,122 +14,85 @@
 
         <q-card-section class="container--fluid" style="height: 89vh;">
           <div class="text-h4">Employee Management </div>
-          <!-- new Employee dialog -->
-          <q-dialog v-model="newEmployeeDialog" persistent >
-            <q-card  :style="{ width: $q.screen.xs ? '100%' : '50%' }" >   
-              <q-form @submit="newEmployee" @reset="newEmployeeReset">
-                <q-inner-loading :showing="loading"
-                label="Updating Record..."
-                label-class="text-black"
-                label-style="font-size: 1.1em"
-                color="black"
-                style="z-index: 1000;" 
-                >
-              </q-inner-loading>
-                <q-page-container style="padding:10px;" >                
-                  <div class="text-h5" style="margin: 5px;">{{!NEW_EMPLOYEE.id?'New ':'Update '}} Employee</div> 
-                  <!-- lname -->
-                  <q-input 
-                    required 
-                    label="Lastname" 
-                    dense 
-                    outlined 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_EMPLOYEE.lname"
-                    :rules="[rules.noSpaceStart,rules.requiredField]"
-                    >
-                  </q-input> 
-                  <!-- fname -->
-                  <q-input 
-                    required 
-                    label="Firstname" 
-                    dense 
-                    outlined 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_EMPLOYEE.fname"
-                    :rules="[rules.noSpaceStart,rules.requiredField]"
-                    >
-                  </q-input>  
-                  <!-- mname -->
-                  <q-input 
-                    label="Middlename" 
-                    dense 
-                    outlined 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_EMPLOYEE.mname"
-                    :rules="[rules.noSpaceStartButAllowNullOrEmpty,rules.properWordStart]"
-                    >
-                  </q-input>  
-                  <!-- email -->
-                  <q-input 
-                     
-                    label="Email" 
-                    dense 
-                    outlined 
-                    class="q-pa-sm" 
-                    color="primary" 
-                    v-model="NEW_EMPLOYEE.email"
-                    :rules="[rules.properEmail]"
-                    >
-                    <template v-slot:prepend>
-                      <q-icon name="email" />
-                    </template>
-                  </q-input> 
-
-                  <div style="display: flex; justify-content: flex-end;">
-                    <q-btn class="q-ma-md" color="primary" v-if="NEW_EMPLOYEE.id" type="submit">Update</q-btn>
-                    <q-btn class="q-ma-md" color="primary" v-else type="submit">Save</q-btn>
-                    <q-btn class="q-ma-md" type="reset">Cancel</q-btn>
-                  </div>
-
-                </q-page-container>
-              </q-form>           
-            </q-card>
-          </q-dialog>
+          {{ Pagination }}
           <!-- end dialog -->
           <!-- employee list table  -->
             <q-table
               class="my-sticky-header-table"
-              :grid="$q.screen.xs"
               :rows="employeelist"
               :columns="header"
               row-key="email"
               :rows-per-page-options="[ 10, 1, 15, 20, 25, 50, 0 ]"
-              :filter="filter"
               :style="{height: $q.screen.xs ? '90.5%' : '96.5%', 'overflow-y': 'auto'}"
               virtual-scroll-sticky-size-start="100"
+              v-model:pagination = "Pagination"
             >
               <template v-slot:body-cell="props">
                 <q-td
                   :props="props"
-                  :class="(props.row.position)?'text-black':'text-red'"
+                  :class="(props.row.position)?'text-black':'text-red'"                 
                 >
-                  {{props.value}}
+                <span  style="cursor: pointer;" >{{props.value}}</span>
+                  
                 </q-td>
               </template>
 
-              <template v-slot:body-cell-action="props">
-                <q-td :props="props" 
-                  :class="(props.row.status =='Inactive')?'text-red':'text-black'">
-                  <q-btn color="positive" icon="edit" round flat @click="showUpdateEmployeeDialog(props.row)"></q-btn>
-                  <q-btn color="negative" icon="delete" round flat :disabled="props.row.position" @click="deleteEmployee(props.row)"></q-btn>
-                </q-td>
-              </template>   
               <template v-slot:top>
-                <q-btn push color="primary" @click=" newEmployeeReset(), newEmployeeDialog = !newEmployeeDialog">New Employee</q-btn>
                   <q-space />
-                  <q-input dense debounce="300" color="primary" v-model="filter" placeholder="Search">
+                  <q-input dense debounce="500" color="primary" v-model="filter" placeholder="Search" style="width: 50%;">
                     <template v-slot:append>
-                      <q-icon name="search" />
+                      <q-icon name="search"/>
                     </template>
                   </q-input>
               </template>
 
+              <template v-slot:pagination="scope">
+                
+                <q-btn
+                v-if="scope.pagesNumber > 2"
+                icon="first_page"
+                color="grey-8"
+                round
+                dense
+                flat
+                :disable="scope.isFirstPage"
+                @click="scope.firstPage"
+                />
+
+                <q-btn
+                icon="chevron_left"
+                color="grey-8"
+                round
+                dense
+                flat
+                :disable="scope.isFirstPage"
+                @click="scope.prevPage"
+                />
+
+                <q-btn
+                icon="chevron_right"
+                color="grey-8"
+                round
+                dense
+                flat
+                :disable="scope.isLastPage"
+                @click="scope.nextPage"
+                />
+
+                <q-btn
+                v-if="scope.pagesNumber > 2"
+                icon="last_page"
+                color="grey-8"
+                round
+                dense
+                flat
+                :disable="scope.isLastPage"
+                @click="scope.lastPage"
+                />
+              </template>
+
               <!-- ↓↓↓↓↓ this is for gridview such as viewing on small screen like android -->
-              <template v-slot:item="props">
+              <!-- <template v-slot:item="props">
                 <q-card style="width: 100%;height:min-content;" class="q-ma-sm">
                   <q-list dense>
                     <q-item v-for="col in props.cols" :key="col.name">
@@ -155,7 +118,7 @@
                   </q-list>
                 </q-card>
 
-              </template>
+              </template> -->
               <!-- ↑↑↑↑↑ this is for gridview such as viewing on small screen like android -->
 
             </q-table>
@@ -172,7 +135,7 @@
   import { useQuasar } from 'quasar'
   
   export default defineComponent({
-    name: 'EmployeeMgt',
+    name: 'SelectEmployee',
     setup(){
       const $q = useQuasar();
       return{
@@ -297,39 +260,14 @@
               email:null,
             }
             this.newEmployeeDialog = false;
-      }
+      },
+
     },
     data(){
       return {
         testObj:{},
         filter:"",
         loading:false,
-        newEmployeeDialog:false,
-        rules: {
-                noSpace: v => (!v?.includes(' ')) || "No space allowed.",
-                properWordStart: v => !v || /^[a-zA-Z_]/.test(v) ||  'Must Start with letter.',
-                notEmpty:(v) => (v && v.replaceAll(' ','').length > 0) ||  "Empty Value.",
-                noSpaceStart:(v) => (v && v.charAt(0) != ' ') || "No space allowed at start",
-                noSpaceStartButAllowNullOrEmpty:(v) => (v === null || (v??'').length === 0 ) || (v && v.charAt(0) != ' ') || "No space allowed at start",
-                requiredField: v => !!v || "Required field.", 
-                requiredSelection: v => !!v || "Required at least one selection",
-                properEmail: v => !v || /^\w+([.-]?\w+)*@msugensan\.edu\.ph$/.test(v) ||  'E-mail must be valid. Ex. juandelacruz@msugensan.edu.ph',
-                matchPassword: v => v === this.form.password || "Does not match new password.",
-                mobileNumber: v => !v || /^(09)\d{9}$/.test(v) || 'Mobile number must be valid. Ex. starts with (09) followed by xxxxxxxxx, where x = numeric character only', 
-                maxLength: (v) => (v && v.length <= 12) || "Max 12 characters",
-                numbers: (v) => (!isNaN(v) && /^[0-9.]*$/.test(v)) || !v || "Must be positive numbers only",
-                currency: v => (/^[1-9]\d*(((,\d{3}){1})?(\.\d{0,2})?)$/.test(v)) || (/^[1-9]\d*(((,\d{3}){2})?(\.\d{0,2})?)$/.test(v)) || (/^[0]\.\d{0,2}$/.test(v))|| v ==="0.00" || v ==="0"  || 'Currency value only',
-                // float: (v) => ((!isNaN(this.StringToNumber(v)) && this.StringToNumber(v).indexOf('.') != -1) || (!isNaN(this.StringToNumber(v)) && /^[0-9]*$/.test(this.StringToNumber(v)))) || "Must be a number"
-                ///^(09|\+639)\d{9}$/ <- if needed full philippine mobile number 
-            },
-        NEW_EMPLOYEE:{
-          id:null,
-          email:null,
-          lname:null,
-          fname:null,
-          mname:null,
-          email:null,
-        },
         header : [
             {
               name: 'email',
@@ -352,18 +290,27 @@
               field: 'position',
               format: (value) => { return value??'Inactive';},
               sortable: true
-            },
-            {
-              name: 'action',
-              label: 'Action',
-              align: 'center',
-            },
+            }
           ],
         employeelist:[],
+        Pagination: {
+            sortBy: 'email',
+            descending: false,
+            page: 1,
+            rowsPerPage: 10
+            // rowsNumber: xx if getting data from a server
+        },
       };
     },
     mounted(){
       this.queryEmployeeList();
+    },
+    watch:{
+
+        filter(newVal){
+            alert(newVal)
+        }
+        // filter: 'debouncedFilter',
     }
   })
   </script>

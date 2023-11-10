@@ -16,7 +16,7 @@ const routes = [
   {
     path: '/dashboard',
     name:'dashboard',
-    component: () => import('pages/TestPage.vue'),
+    component: () => import('components/SelectEmployee.vue'),
     meta:{
       title:'Dashboard',
       roles:[]
@@ -139,7 +139,7 @@ const routes = [
               title:'Office Details',
               roles:['HR','OFFICE_HEAD','OFFICE_STAFF']
             },
-            visible:false,            
+            visible:false,  
           }
         ]
       },

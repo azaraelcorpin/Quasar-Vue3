@@ -5,7 +5,7 @@
       </q-inner-loading>
 
         <!-- Test button -->
-      <q-btn @click="$router.push({name:'offices'})" style="  position: fixed;right: 1%; z-index: 1000;">
+      <q-btn v-if="hasRolesManageOffices" @click="$router.push({name:'offices'})" style="  position: fixed;right: 1%; z-index: 1000;">
         Back to Office Management
       </q-btn>
       <!-- test button -->
@@ -14,7 +14,7 @@
 
         <q-card-section class="container--fluid " style="height: 89vh;">
           
-            <div class="text-h4">{{OFFICE_INFO.Description??''.toUpperCase()}} </div>
+            <div class="text-h4">{{(OFFICE_INFO.Description??'').toUpperCase()}} </div>
             <div v-if="getOfficeHead()">
               <div class="text-h6">{{getOfficeHeadFullname().toUpperCase()}} </div>
               <div class="text-h7">{{getOfficeHead().position.toUpperCase()}} </div>
@@ -22,7 +22,11 @@
             <div v-else>
               <div class="text-h7" style="color: red;">No Office Head Assigned </div>
             </div>
+            <q-btn @click="loading = !loading">test</q-btn>
             <div class="q-mt-lg" >
+              <q-dialog v-model="loading"  >
+                <add-employee></add-employee>
+              </q-dialog>
                 <q-table
                 class="my-sticky-header-table"
                 :grid="$q.screen.xs"
@@ -104,6 +108,7 @@ import { defineComponent } from 'vue'
 import api from 'src/API/api';
 import dialog from 'src/plugins/myDialog';
 import { useQuasar } from 'quasar';
+import AddEmployee from '../MyOffice/AddEmployee.vue';
 
 export default defineComponent({
   setup(){
@@ -111,6 +116,9 @@ export default defineComponent({
     return{
 
     }
+  },
+  components:{
+    AddEmployee,
   },
   data(){
     return{
@@ -192,30 +200,38 @@ export default defineComponent({
   },
   mounted(){
     // alert(this.$route.params.id)
-      this.getOfficeData()
     /**
      * Checking if the user is authorized to access this office details... checking if user has office id on officesRoles
      */
-    //  const ImDev = localStorage.getItem('ImDev');
-    //  if(ImDev){ this.UserType = 'ImDev'; return }    /// if developer pass to all auth
-    // this.UserType = null
-    //  const offices = JSON.parse(localStorage.getItem('officesAndRoles'));    
-    // let role = offices?offices.find(item=>(item.office_id+'' === this.$route.params.id && item.role === 'OFFICE_HEAD')):null;
-    // role = role??offices.find(item=>(item.office_id === this.$route.params.id && item.role === 'OFFICE_STAFF'))
-    // console.log('role',role)
-    // if(role)
-    // this.UserType = role.role
-    // else{
-    //   dialog.negative(this.$q,"Forbidden","Access Denied on "+this.$route.meta.title).onOk(()=>{
-    //             if(this.$route.meta.from.name){
-    //               this.$router.push(this.$route.meta.from);
-    //             }
-    //             else
-    //                this.$router.push({name:'dashboard'});
-    //     }) ; 
-    // }
-        
+     const ImDev = localStorage.getItem('ImDev');
+     if(ImDev){ this.UserType = 'ImDev';    this.getOfficeData();  return }    /// if developer pass to all auth
+
+      this.UserType = null;
+      const offices = JSON.parse(localStorage.getItem('officesAndRoles'));    
+      let role = offices?offices.find(item=>(item.office_id+'' === this.$route.params.id && item.role === 'OFFICE_HEAD')):null;
+      role = role??(offices??[]).find(item=>(item.office_id+'' === this.$route.params.id && item.role === 'OFFICE_STAFF'));
+
+      const roles = JSON.parse(localStorage.getItem('userRoles')); 
+      // console.log('role',offices.find(item=>(item.office_id+'' === this.$route.params.id && item.role === 'OFFICE_HEAD')))
+      if(role || roles.find(item=>(item === 'HR')))
+            this.UserType = role?role.role:'HR'        
+      else{
+        dialog.negative(this.$q,"Forbidden","Access Denied on "+this.$route.meta.title).onOk(()=>{
+                  if(this.$route.meta.from.name){
+                    this.$router.push(this.$route.meta.from);
+                  }
+                  else
+                    this.$router.push({name:'dashboard'});
+          }) ; 
+      }
+      this.getOfficeData()        
   },
+  computed:{
+    hasRolesManageOffices(){
+      const roles = JSON.parse(localStorage.getItem('userRoles')); 
+      return(this.UserType === 'ImDev' || roles.find(item=>(item === 'HR')))      
+    }
+  }
 })
 </script>
 <style>
