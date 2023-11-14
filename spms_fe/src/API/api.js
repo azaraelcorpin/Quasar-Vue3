@@ -516,4 +516,25 @@ export default {
       }
     },    
 
+    ///// searchEmployee 
+    async searchEmployee(val) {
+      var url = api_url+'/employee/search'
+      const config = await this.getAuthorization();
+      const body = {
+        empName:val
+       }
+      try {      
+        const response = await axios.post(url, body, config);      
+        if (response && response.data && response.status == 200) {
+          return response.data;
+        } else{
+          console.log(response);
+          return {error:response}
+        }
+      } catch (error) {
+        console.log(error.response);
+        this.validateResponse(error)
+        return { error: error.response }??error
+      }
+    },     
 }

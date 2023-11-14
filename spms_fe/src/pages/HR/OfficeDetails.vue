@@ -24,8 +24,8 @@
             </div>
             <q-btn @click="loading = !loading">test</q-btn>
             <div class="q-mt-lg" >
-              <q-dialog v-model="loading"  >
-                <add-employee></add-employee>
+              <q-dialog v-model="loading"   >
+                <add-employee style="width: 50%;"></add-employee>
               </q-dialog>
                 <q-table
                 class="my-sticky-header-table"
