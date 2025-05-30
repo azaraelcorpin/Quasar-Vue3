@@ -1,6 +1,6 @@
 <template>
   <!-- <router-view /> -->
-  <div v-if="false">
+  <div v-if="!toFaculty">
       <main-layout>
           <router-view />
       </main-layout>
@@ -19,6 +19,21 @@ export default defineComponent({
     components:{
       MainLayout,
       facultyDirectory
+    },
+    watch: {
+    // Watch $route.path (reactive in Vue Router)
+    '$route.path'(newPath) {
+      if (newPath === '/facultyDirectory') {
+        this.toFaculty = true
+      } else {
+        this.toFaculty = false
+      }
+    }
+  },
+    data() {
+      return {
+        toFaculty: false
+      }
     },
 })
 </script>

@@ -1,11 +1,17 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <div class="q-pa-md flex flex-center">
-      <div class="top">
-        <q-avatar square class="q-pl-xl">
-              <img src="~assets/MSU_Gensan_logo.png">
-        </q-avatar>
-      </div>
+       <q-toolbar class="top">
+
+        <!-- Left side: Logo -->
+        <q-toolbar-title >
+          <img src="~assets/MSU_Gensan_logo.png" alt="Logo" height="90" />
+        </q-toolbar-title>
+
+        <!-- Right side: Button -->
+        <q-btn label="Login" color="primary" flat round @click="onLogin" />
+
+      </q-toolbar>
       <div class="q-pa bg">
         <div class="q-pa text">Faculty Directory</div>
       </div>
@@ -34,7 +40,7 @@ export default defineComponent({
 <style>
   .bg {
     width: 70%;
-    height: 150px;
+    height: 140px;
     background-image:url('https://facultydirectory.msugensan.edu.ph/assets/msuheader-DC9LfvgY.png');
     background-repeat: no-repeat;
     background-size: cover;

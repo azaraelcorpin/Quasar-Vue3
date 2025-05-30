@@ -12,14 +12,14 @@ const routes = [
     visible:false,
   },
   {
-    path: '/faculty',
-    name:'home1',
+    path: '/facultyDirectory',
+    name:'facultyDirectory',
     component: () => import('src/pages/facultyDirectory.vue'),
     meta:{
       title:'Faculty Directory',
       roles:[]
     },
-    icon:'home',
+    icon:'user',
     visible:true,
   },
   {
