@@ -12,6 +12,17 @@ const routes = [
     visible:false,
   },
   {
+    path: '/faculty',
+    name:'home1',
+    component: () => import('src/pages/facultyDirectory.vue'),
+    meta:{
+      title:'Faculty Directory',
+      roles:[]
+    },
+    icon:'home',
+    visible:true,
+  },
+  {
     path: '/dashboard',
     name:'dashboard',
     component: () => import('pages/TestPage.vue'),

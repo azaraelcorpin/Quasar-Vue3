@@ -149,7 +149,6 @@ import { useRouter } from 'vue-router'
 
 export default defineComponent({
   name: 'MainLayout',
-
   components: {
   },
 
