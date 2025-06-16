@@ -23,6 +23,17 @@ const routes = [
     visible:true,
   },
   {
+    path: '/facultyProfile',
+    name:'facultyProfile',
+    component: () => import('src/pages/facultyProfile.vue'),
+    meta:{
+      title:'Faculty Profile',
+      roles:[]
+    },
+    icon:'user',
+    visible:true,
+  },
+  {
     path: '/dashboard',
     name:'dashboard',
     component: () => import('pages/TestPage.vue'),

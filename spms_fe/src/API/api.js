@@ -110,8 +110,8 @@ export default {
     },  
 
         ///// new User
-    async newUser(param) {
-      var url = api_url+'/user/new'
+    async updateFacultyProfile(param) {
+      var url = api_url+'/updateFacultyProfile'
       const config = await this.getAuthorization();
       const body = {
         email:param.email,

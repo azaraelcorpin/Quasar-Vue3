@@ -1,0 +1,365 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  background-color: #e0e0e0;
+}
+
+.searchbar{
+  border-radius: 9px;
+  padding: 10px;
+  margin-bottom: 20px;
+  min-width: 500px;
+  text-transform: uppercase;
+}
+.column {
+  float: left;
+  width: 24.5%;
+  padding: 10px 10px; 
+}
+.row .colleges{
+text-align: center;
+}
+.rows {
+  margin: 0 -5px;
+  display: flex;
+  flex-wrap: wrap;
+}
+.rows:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+ 
+.row {
+  margin: 0 -5px; 
+}
+ 
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+ 
+@media screen and (max-width: 1000px) {
+  .column {
+    width: 50%;
+    display: block;
+    margin-bottom: 20px;
+  }
+  #facultytable{
+    width: 100%;
+    min-width: none;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+    display: block;
+    margin-bottom: 20px;
+  }
+  #facultytable{
+    width: 100%;
+    min-width: none;
+  }
+}
+
+
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  padding: 12px;
+  text-align: center;
+  background-color: #f1f1f1;
+  transition: 0.3s;
+  border-radius: 10px;
+  min-height: 400px;
+}
+.card h2{
+  font-size: 1em;
+}
+.card:hover {
+  box-shadow: 0 4px 30px 0 rgba(0,0,0,0.4);
+}
+
+img {
+  border-radius: 10px 10px 10px 10px;
+}
+
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;  
+}
+.logo{ 
+  text-align: left;
+  margin-left: 20px;
+  background: url('../assets/logo.png') no-repeat center center;
+  background-size: cover;
+  height: 60px;
+  width: 60px;
+}
+ .login{
+  padding-bottom: 10px;
+ text-align: right;
+ margin-right: 20px;
+ }
+.login-btn {
+  background-color: #990202; 
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.login-btn:hover {
+  background-color:  #660202; 
+  transform: scale(1.05); 
+}
+header h1{
+  text-shadow:
+  0 0 2px white,
+  0 0 3px white,
+  0 0 4px #00ffff,
+  0 0 5px #00ffff;
+  margin-top:50px;
+} 
+.fname{
+  color: #8b0505;
+}
+header{
+  background: url('../assets/msuheader.png') no-repeat center center;
+  background-size: cover;
+  color: #cfc20a;
+  padding: 20px;
+  text-align: left;
+  height: 140px;
+
+  margin: 0;
+} 
+.records{
+  margin: 10px 0 10px 0; 
+}
+#app-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+ 
+}
+.flex button{
+  padding: 10px;
+  margin-right: 4px;
+}
+#facultytable{
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 1090px; 
+}
+#facultytable td{
+   font-size: .8em;
+   border: 1px solid #cdcecf;
+   padding-left: 10px;
+   padding-right: 10px;
+}
+ 
+#facultytable tr:nth-child(even){background-color: #ebe8e8; border-top: 1px solid #555; border-bottom: 1px solid #555;}
+
+#facultytable tr:hover {background-color: #ddd;}
+
+#facultytable th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #ece8c1;
+ padding-left: 10px;
+ border: 1px solid #cdcecf;
+}
+.p-2{
+  color:#000000;
+}
+
+.linktd{
+  cursor: pointer;
+
+}
+.fname{
+  color: #550000;
+}
+ footer {
+  background: #550000;
+  color: #fff;
+  padding: 20px;
+  text-align: center;
+  margin: 0;
+  margin-top: -30px;
+}
+
+.container {
+  max-width: 1280px; 
+  min-height: 600px;
+  padding: 50px;
+  background: #f1f1f1; 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0px;
+}
+.row{
+  text-align: left;
+}
+.profile{
+  max-width: 1000px;
+  width: 100%;
+  text-align: left  ;
+}
+.profile-card {
+    display: flex;
+    flex-direction: row;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 1000px;
+    width: 100%;
+    margin: 2rem auto;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+ 
+  .profile-left {
+    flex: 1;
+    background: #e9ecef;
+    padding: 2rem; 
+    text-align: left;
+  }
+  
+  .profile-photo {
+    width: 250px;
+    height: 350px;
+    border-radius: 10%;
+    object-fit: cover;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .contact-info p {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+    color: #333;
+  }
+
+  .contact-info h3 {
+    margin: -0.5rem 0;
+    font-size: 0.95rem;
+    color: #333;
+  }
+  
+  .profile-right {
+    flex: 2;
+    padding: 2rem;
+    text-align: left;
+  }
+  
+  .profile-right h1 {
+    font-size: 2rem; 
+  }
+  
+  .profile-right h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    color: #555;
+    margin-top: 0px;
+  }
+  .profile-right h3{
+    font-size: 1.25rem; 
+    color: #555; 
+    margin-top: 10px;
+  }
+  .profile-right span {
+    font-size: 1em;
+    margin-bottom: 1rem;
+    color: #555;
+    margin-top: -6px;
+    border: 1px solid;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    border-radius: 10px;
+    padding: 5px 10px;
+    white-space: nowrap;
+    
+  }
+  .image-fade-enter-active, .image-fade-leave-active {
+    transition: opacity 0.5s ease-in-out;
+  }
+  
+  .image-fade-enter, .image-fade-leave-to {
+    opacity: 0;
+  }
+  .span-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    max-width: 100%;
+    padding: 10px;
+    word-wrap: break-word;       
+    overflow-wrap: break-word;  
+    box-sizing: border-box;
+  }
+
+  .span-container span {
+    background-color: #e0e0e0;
+    padding: 6px 12px;
+    border-radius: 12px;
+    white-space: normal;         
+    word-break: break-word;      
+    max-width: 100%;            
+    flex-shrink: 1;              
+  }
+  
+  .bio {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    color: #444;
+  }
+  
+  .extra-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .extra-info ul {
+    padding-left: 1.2rem;
+    list-style-type: disc;
+    color: #333;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .profile-card {
+      flex-direction: column;
+    }
+
+    #facultytable{
+      width: 100%;
+      min-width: none !important;
+    }
+  
+    .profile-left,
+    .profile-right {
+      padding: 1.5rem;
+    }
+  
+    .profile-photo {
+      width: 120px;
+      height: 120px;
+    }
+  }
+  
