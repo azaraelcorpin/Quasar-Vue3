@@ -47,22 +47,28 @@ export default{
                 },
             })
         },
-        confirm($q,title,message){
-            return $q.dialog({
-            title: '<span class="material-icons" style="color:#F2C037; font-size:36px;margin:5px">question_mark</span>' + title,
-            message: message,
-            html:true,
-            dark: true,
-            persistent:true,
-                ok: {
-                label:'OK',
-                push: true,
-                color: 'positive'
+        confirm($q, title, message) {
+                return new Promise((resolve, reject) => {
+                    $q.dialog({
+                    title: title,
+                    message: message,
+                    cancel: true,
+                    persistent: true,
+                    ok: {
+                        label: 'Yes',
+                        color: 'positive'
+                    },
+                    cancel: {
+                        label: 'No',
+                        color: 'negative'
+                    }
+                    }).onOk(() => {
+                    resolve(); // ✅ will continue after await
+                    }).onCancel(() => {
+                    reject('cancel'); // ✅ goes to catch
+                    }).onDismiss(() => {
+                    reject('dismiss'); // optional
+                    });
+                });
                 },
-                cancel:{
-                push: true,
-                color: 'negative'
-                },
-            })
-        },
 }

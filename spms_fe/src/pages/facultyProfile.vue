@@ -16,10 +16,6 @@
    <section class="container">
 
   
- 
- 
-
-
  <div class="profile">
 
 
@@ -105,7 +101,7 @@
           dense
           flat
           color="primary"
-          @click="showdialog = true; field='Specializations'; message = (String(selectedFaculty.specializations)||'').split(';')
+          @click="showdialog = true; field='Specialization'; message = (String(selectedFaculty.specializations)||'').split(';')
                           .map(item => item.trim())
                           .filter(Boolean)
                           .join(';\n\n')"
@@ -347,13 +343,27 @@ export default defineComponent({
   name: 'facultyProfile',
   mounted() {
     // this.onLogin(); // ← call it here
+    this.$q.loading.show({
+      message: 'Loading Profile...',
+      spinnerSize: 50,
+      spinnerColor: 'primary',
+      backgroundColor: 'white',
+      messageColor: 'primary'
+    });
+
     if(this.cookies.isKey('_UID_')) {
       this.SID = JSON.parse(JSON.stringify(this.cookies.get('_UID_')));
       console.log('SID', this.SID.userEmail);
 
-      this.onLogin("mario.aguja@msugensan.edu.ph");
+      this.onLogin(this.SID.userEmail);
+          setTimeout(() => {
+          this.$q.loading.hide()
+        }, 3000)
     } else {
-      this.logout();
+          setTimeout(() => {
+          this.$q.loading.hide()
+        }, 3000)
+        this.$router.push({ name: 'facultyDirectory' });
     }
   },
   setup() {
@@ -362,16 +372,25 @@ export default defineComponent({
     const router = useRouter();
     return {
       cookies,
+      
     }
   },
   methods: {
     async onLogin(userEmail) {
-      let res = await axios.get(`https://qrattendance.msugensan.edu.ph/api/allfaculties`)
-      let facultyList = res.data
+      const res = await api.getAllFaculty()
+      if(res.error) {
+        this.cookies.remove('_UID_');
+        this.SID = {};        
+        myDialog.negative($q, "Error", res.error);
+        this.$router.push({ name: 'facultyDirectory' });
+        return;
+      }
+      let facultyList = res.FacultyList??[]
       console.log('facultyList', facultyList);
       let faculty = facultyList.find(faculty => faculty.email_address === userEmail);
       if (faculty) {
         this.selectedFaculty = {
+          faculty_id: faculty.id,
           pic: faculty.pic || 'images/default.png',
           facname: faculty.facname,
           currentrank: faculty.currentrank,
@@ -395,17 +414,30 @@ export default defineComponent({
       }
     },
     async handlesFacultyUpdate(_field, _data) {
-      this.selectedFaculty[_field.toLowerCase().replace(' ', '_')] = _data;
-      let resp = await api.updateFacultyProfile(this.SID, this.selectedFaculty);
       this.showdialog = false;
-      // let resp = await api.generateSessionId(this.SID);   
-      //             console.log('reso',resp)    
-      // if(resp.error){
-      //   myDialog.negative(this.$q, "Log In Failed", "Account not found in the system. Please contact the administrator.");
-      //   return;
-      // } else {
-      //   myDialog.positive(this.$q, "Updated", "You have successfully updated.");
-      // }      // Process token or send to backend
+      // let resp = await api.updateFacultyProfile(this.SID, this.selectedFaculty);
+      try {
+        await myDialog.confirm(this.$q, "Update Confirmation", `Are you sure you want to update your ${_field}?`)
+        this.selectedFaculty[_field.toLowerCase().replace(' ', '_')] = _data;
+        this.$q.loading.show({  // Show loading dialog
+            message: 'Updating Profile...',
+            spinnerSize: 50,
+            spinnerColor: 'primary',
+            backgroundColor: 'white',
+            messageColor: 'primary'
+          });
+        let resp = await api.updateFacultyProfile(_field.toLowerCase().replace(' ', '_'), _data.replace(/\n/g, ' '), this.selectedFaculty.faculty_id);
+        console.log('resp', resp);
+        if (resp.statusCode === "200")       
+          myDialog.positive(this.$q, "Update Successful", `You have successfully updated your ${_field}.`);
+        else
+          // throw new Error('Failed to update profile');
+        myDialog.negative(this.$q, "Update Failed", `Failed to update your ${_field}. Please try again later.`);
+      } catch (error) {
+        this.$q.loading.hide(); // Hide loading dialog
+        return
+      }
+      this.$q.loading.hide(); // Hide loading dialog
     },
     logout() {
       this.cookies.remove('_UID_');

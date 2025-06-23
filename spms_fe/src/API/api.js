@@ -110,22 +110,20 @@ export default {
     },  
 
         ///// new User
-    async updateFacultyProfile(param) {
+    async updateFacultyProfile(_field, _data,faculty_id) {
       var url = api_url+'/updateFacultyProfile'
       const config = await this.getAuthorization();
       const body = {
-        email:param.email,
-        userName:param.userName,
-        userType:param.userType,
-        officeId:param.userType === 'OFFICE_STAFF'? param.officeId.id:null,
-        privileges:param.privileges,
-       }
+        field:_field,
+        data:_data,
+        faculty_id:faculty_id
+      }
       try {      
         const response = await axios.post(url, body, config);
         if (response && response.data && response.status == 200) {
           return response.data;
         } else{
-          console.log('newUser Error');
+          console.log('Update Faculty Error');
           return {error:response}
         }
       } catch (error) {
@@ -134,61 +132,14 @@ export default {
       }
     },  
 
-    //// update User
-    async updateUser(param) {
-      var url = api_url+'/user/update'
-      const config = await this.getAuthorization();
-      const body = {
-        email:param.email,
-        userName:param.userName,
-        userType:param.userType,
-        officeId:param.userType === 'OFFICE_STAFF'? param.officeId.id:null,
-        privileges:param.privileges,
-        status:param.status,
-        email_old:param.email_old,
-       }
-      try {      
-        const response = await axios.post(url, body, config);
-        if (response && response.data && response.status == 200) {
-          return response.data;
-        } else{
-          console.log('Update User Error');
-          return {error:response}
-        }
-      } catch (error) {
-        console.log(error.response);
-        return { error: error.response }
-      }
-    },      
 
-       ///// Delete User
-    async deleteUser(param) {
-      var url = api_url+'/user/delete'
-      const config = await this.getAuthorization();
-      const body = {
-        email:param.email,
-       }
-      try {      
-        const response = await axios.post(url, body, config);
-        if (response && response.data && response.status == 200) {
-          return response.data;
-        } else{
-          console.log('newUser Error');
-          return {error:response}
-        }
-      } catch (error) {
-        console.log(error.response);
-        return { error: error.response }
-      }
-    },  
-
-    ///// getAllUser 
-    async getAllUser() {
-      var url = api_url+'/user/all'
-      const config = await this.getAuthorization();
+    ///// getfacultylist
+    async getAllFaculty() { 
+      var url = api_url+'/getFacultyList'
+      // const config = await this.getAuthorization();
       const body = { }
       try {      
-        const response = await axios.post(url, body, config);      
+        const response = await axios.post(url, body);      
         if (response && response.data && response.status == 200) {
           return response.data;
         } else{
@@ -196,9 +147,22 @@ export default {
           return {error:response}
         }
       } catch (error) {
-        console.log(error.response);
-        this.validateResponse(error)
-        return { error: error.response }??error
+        console.log(error);
+          if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+            // Server is likely offline or unreachable
+            console.error('🛑 Server is down or not reachable.');
+            // You can also show a user-friendly message:
+            return { error: 'Server is down or not reachable.' };
+          } else if (error.response) {
+            // Server responded but with an error (4xx, 5xx)
+                console.error('❌ Server error:', error.response.status);
+                console.error('📝 Details:', error.response.data);
+            return { error: error.response };
+          } else {
+            // Unknown error
+            console.error('⚠️ Unexpected error:', error.message);
+            return { error: 'An unexpected error occurred: ' + error.message };
+          }
       }
     },    
 

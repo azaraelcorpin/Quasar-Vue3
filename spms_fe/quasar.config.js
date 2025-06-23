@@ -96,7 +96,22 @@ module.exports = configure(function (/* ctx */) {
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#framework
     framework: {
-      config: {},
+      config: {
+        loading: {
+          delay: 0,
+          spinnerSize: 50,
+          spinnerColor: '#fff',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          messageColor: '#fff',
+          message: 'Loading...'
+        },
+        notify: {
+          position: 'top-right',
+          timeout: 3000,
+          textColor: 'white',
+          actions: [{ icon: 'close', color: 'white' }]
+        }
+      },
 
       // iconSet: 'material-icons', // Quasar icon set
       // lang: 'en-US', // Quasar language pack
@@ -112,7 +127,9 @@ module.exports = configure(function (/* ctx */) {
       plugins: [
         'LocalStorage',
         'SessionStorage',
-        'Dialog'
+        'Dialog',
+        'Loading',
+        'Notify',
       ]
     },
 

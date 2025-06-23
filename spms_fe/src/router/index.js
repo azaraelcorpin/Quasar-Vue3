@@ -19,7 +19,7 @@ function handleRouteNavigationAndTitleChange(to, from, next) {
     next();
   } else {
     document.title = process.env.VUE_APP_NAME + '-' + 'Sign In';
-    next({ name: 'signIn' });
+    next({ name: 'facultyDirectory' });
   }
 }
 

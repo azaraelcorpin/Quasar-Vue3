@@ -180,7 +180,7 @@
  </div>
  </div>
  
- <div v-else class="row">
+ <div style="display: block;" v-else class="row">
  
  <div class="search-bar">
       <input
@@ -193,13 +193,13 @@
     </div>
 
 
-    <div class="mb-4">
-        <button 
+    <div class="q-mb-4 flex flex-wrap gap-2" >
+        <button style="border-radius: 15%;"
           v-for="letter in alphabet"
           :key="letter"
           @click="sc(letter)"
           :class="[
-            'px-3 py-1 rounded border text-sm',
+            'q-pa-sm q-py-xs rounded-borders text-subtitle1',
             selectedLetter === letter ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'
           ]"
         >
@@ -298,8 +298,13 @@ const toTitleCase = (str) => {
     .join(' '); 
 }
 onMounted(async () => {
-  const res = await axios.get(`https://qrattendance.msugensan.edu.ph/api/allfaculties`)
-  facultyList.value = res.data
+  // const res = await axios.get(`https://qrattendance.msugensan.edu.ph/api/allfaculties`)
+  const res = await api.getAllFaculty()
+  if(res.error) {
+    myDialog.negative($q, "Error", res.error);
+    return;
+  }
+  facultyList.value = res.FacultyList??[]
 
 console.log(facultyList.value)
   const facultyIdFromUrl = new URLSearchParams(window.location.search).get('facultyId')
@@ -376,10 +381,17 @@ function onLogin() {
     async function handleCredentialResponse(response) {
       const userData = decodeCredential(response.credential);
       let SID = {};
-      SID.userEmail = userData.email;   
+      SID.userEmail = userData.email; 
+      // SID.userEmail = 'juniven.acapulco@msugensan.edu.ph'  
       SID.name = userData.name;
       SID.picture = userData.picture;
-   
+      let faculty = facultyList.value.find(faculty => faculty.email_address === SID.userEmail);
+      SID.facultyId = faculty ? faculty.id : null;
+      
+      if (!SID.facultyId) {
+        myDialog.negative($q, "Log In Failed", "Account not found in the system. Please contact the administrator.");
+        return;
+      }
       console.log('Encoded JWT ID token: ' , SID);
       let resp = await api.generateSessionId(SID);   
                   console.log('reso',resp)    
