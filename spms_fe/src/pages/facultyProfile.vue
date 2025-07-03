@@ -191,19 +191,25 @@
            </span>
       </div>
         
-        <q-card-section >
-          <q-input
+        <q-card-section style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+          <!-- with rules no double colon -->
+          <q-input style="width: 100%;"
             v-model="dialogEntry"
             type="text"
             autogrow
             autofocus
+            :rules="[
+              val => !val.includes('::') || 'Entry cannot contain double colon'
+            ]"   
+                     
           />
           <q-btn
             icon="add"
             color="primary"
             flat
+            :disable="dialogEntry.includes('::')||dialogEntry.trim() === ''"
             @click="() => {
-              const specs = message.split(';').map(x => x.trim()).filter(Boolean);
+              const specs = message?.split(';').map(x => x.trim()).filter(Boolean)||[];
               if (dialogEntry.trim()) {
                 specs.push(dialogEntry.trim());
                 message = specs.join('; ');

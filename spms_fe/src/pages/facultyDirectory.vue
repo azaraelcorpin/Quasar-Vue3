@@ -387,7 +387,7 @@ function onLogin() {
       const userData = decodeCredential(response.credential);
       let SID = {};
       SID.userEmail = userData.email; 
-      SID.userEmail = 'juniven.acapulco@msugensan.edu.ph'   // For testing purposes, hardcoding the email
+      // SID.userEmail = 'juniven.acapulco@msugensan.edu.ph'   // For testing purposes, hardcoding the email
       SID.name = userData.name;
       SID.picture = userData.picture;
       let faculty = facultyList.value.find(faculty => faculty.email_address === SID.userEmail);
