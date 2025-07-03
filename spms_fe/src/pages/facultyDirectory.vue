@@ -72,7 +72,7 @@
 
   
 
-<div class="span-container" v-if="hasColon(selectedFaculty.specializations)">
+<!-- <div class="span-container" v-if="hasColon(selectedFaculty.specializations)">
         <div
           v-for="(item, i) in parsedSpecializations(selectedFaculty.specializations)"
           :key="i"
@@ -82,15 +82,19 @@
         </div>
       </div>
 
-      
-      <div class="span-container" v-else-if="selectedFaculty.specializations">
-         <span
+       -->
+      <div class="span-container" v-if="selectedFaculty.specializations">
+         <div
               v-for="(spec, i) in getSpecializations(selectedFaculty.specializations)"
               :key="i"
           
             >
-            {{toTitleCase(spec)}}
-           </span>
+            <!-- {{toTitleCase(spec)}} -->
+             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
+             <span v-else>
+              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
+             </span>             
+            </div>
       </div>
  
       <div v-else>
@@ -299,6 +303,7 @@ const toTitleCase = (str) => {
 }
 onMounted(async () => {
   // const res = await axios.get(`https://qrattendance.msugensan.edu.ph/api/allfaculties`)
+  onLogin();
   const res = await api.getAllFaculty()
   if(res.error) {
     myDialog.negative($q, "Error", res.error);
@@ -370,7 +375,7 @@ function onLogin() {
           { theme: "outline", size: "large" } // customization attributes
         );
 
-        window.google.accounts.id.prompt(); // optional: for One Tap 
+        // window.google.accounts.id.prompt(); // optional: for One Tap 
       } else {
         console.error("Google Identity script not loaded.");
       }
@@ -382,7 +387,7 @@ function onLogin() {
       const userData = decodeCredential(response.credential);
       let SID = {};
       SID.userEmail = userData.email; 
-      // SID.userEmail = 'juniven.acapulco@msugensan.edu.ph'  
+      SID.userEmail = 'juniven.acapulco@msugensan.edu.ph'   // For testing purposes, hardcoding the email
       SID.name = userData.name;
       SID.picture = userData.picture;
       let faculty = facultyList.value.find(faculty => faculty.email_address === SID.userEmail);

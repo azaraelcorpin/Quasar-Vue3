@@ -114,57 +114,142 @@
         <q-card-section>
           <div class="text-h6">Update {{ field }}</div>
         </q-card-section>
+<!-- {{ message }} -->
+      <!-- <div class="span-container" v-if="hasColon(message)">
+ 
+        <span
+          v-for="(item, i) in parsedSpecializationsDialog"
+          :key="i"
+          class="spec-line"
+        >
+          <strong>{{ item.key }}:</strong> {{ toTitleCase(item.value) }}
+          <q-icon
+            name="delete"
+            class="cursor-pointer"
+            @click="() =>{
+              const specs = message.split(';').map(x => x.trim()).filter(Boolean);
+              specs.splice(i, 1);
+              message = specs.join('; ');
+              console.log('Updated entry:', message);
+            }"
+            size="16px"
+            color="primary"
+            ></q-icon>
+            <q-icon
+                name="edit"
+                class="cursor-pointer"
+                @click="() => {
+                  dialogEntry = item.key + ': ' + item.value;
+                  const specs = message.split(';').map(x => x.trim()).filter(Boolean);
+                  specs.splice(i, 1);
+                  message = specs.join('; ');
+                  console.log('Updated entry:', message);
+                }"
+                size="16px"
+                color="primary"
+              ></q-icon>
+        </span>
+      </div> -->
 
+      
+      <div class="span-container">
+         <span
+              v-for="(spec, i) in getSpecializationsDialog"
+              :key="i"
+          
+            >
+            <!-- {{toTitleCase(spec)}} -->
+             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
+             <span v-else>
+              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
+             </span>
+                <q-icon
+                      name="delete"
+                      class="cursor-pointer"
+                      @click="() =>{
+                        const specs = message.split(';').map(x => x.trim()).filter(Boolean);
+                        specs.splice(i, 1);
+                        message = specs.join('; ');
+                        console.log('Updated entry:', message);
+                      }"
+                      size="16px"
+                      color="primary"
+                ></q-icon>
+                <q-icon
+                      name="edit"
+                      class="cursor-pointer"
+                      @click="() => {
+                        dialogEntry = spec;
+                        const specs = message.split(';').map(x => x.trim()).filter(Boolean);
+                        specs.splice(i, 1);
+                        message = specs.join('; ');
+                        console.log('Updated entry:', message);
+                      }"
+                      size="16px"
+                      color="primary"
+              ></q-icon>
+           </span>
+      </div>
+        
         <q-card-section >
           <q-input
-            v-model="message"
-            type="textarea"
+            v-model="dialogEntry"
+            type="text"
             autogrow
             autofocus
-            :label="['Phone', 'Linked In', 'Google Scholar'].includes(field)
-                    ? field+(field==='Phone'?'':'   (example: https://www.example.com) for links')
-                    : 'Separated with semicolon (;) e.g. ' + field + '1; '+ field +'2'"
           />
+          <q-btn
+            icon="add"
+            color="primary"
+            flat
+            @click="() => {
+              const specs = message.split(';').map(x => x.trim()).filter(Boolean);
+              if (dialogEntry.trim()) {
+                specs.push(dialogEntry.trim());
+                message = specs.join('; ');
+                dialogEntry = '';
+              }
+            }"></q-btn>
           
         </q-card-section>
 
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" v-close-popup />
-          <q-btn flat label="Save" color="primary" @click="handlesFacultyUpdate(field,String(message))" />
+          <q-btn flat label="Cancel" color="primary" @click="dialogEntry=''" v-close-popup />
+          <q-btn flat label="Save" color="primary" @click="handlesFacultyUpdate(field,String(message))" :disable="dialogEntry!==''" />
         </q-card-actions>
       </q-card>
     </q-dialog>
 
-<div class="span-container" v-if="hasColon(selectedFaculty.specializations)">
+<!-- <div class="span-container" v-if="hasColon(selectedFaculty.specializations)">
  
-        <div
+        <span
           v-for="(item, i) in parsedSpecializations(selectedFaculty.specializations)"
           :key="i"
           class="spec-line"
         >
           <strong>{{ item.key }}:</strong> {{ toTitleCase(item.value) }}
-        </div>
-      </div>
+        </span>
+      </div> -->
 
       
-      <div class="span-container" v-else-if="selectedFaculty.specializations">
-         <span
+      <div class="span-container" v-if="selectedFaculty.specializations && selectedFaculty.specializations.length > 0">
+         <div
               v-for="(spec, i) in getSpecializations(selectedFaculty.specializations)"
               :key="i"
           
             >
-            {{toTitleCase(spec)}}
-           </span>
+            <!-- {{toTitleCase(spec)}} -->
+             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
+             <span v-else>
+              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
+             </span>             
+            </div>
       </div>
- 
       <div v-else>
         No specializations listed.
       </div>
-
-
-
-
-            
+ 
+   
            <h3 class="text-weight-bold">Education
                   <q-btn
                 icon="edit"
@@ -418,7 +503,6 @@ export default defineComponent({
       // let resp = await api.updateFacultyProfile(this.SID, this.selectedFaculty);
       try {
         await myDialog.confirm(this.$q, "Update Confirmation", `Are you sure you want to update your ${_field}?`)
-        this.selectedFaculty[_field.toLowerCase().replace(' ', '_')] = _data;
         this.$q.loading.show({  // Show loading dialog
             message: 'Updating Profile...',
             spinnerSize: 50,
@@ -428,8 +512,13 @@ export default defineComponent({
           });
         let resp = await api.updateFacultyProfile(_field.toLowerCase().replace(' ', '_'), _data.replace(/\n/g, ' '), this.selectedFaculty.faculty_id);
         console.log('resp', resp);
-        if (resp.statusCode === "200")       
+        if (resp.statusCode === "200"){
           myDialog.positive(this.$q, "Update Successful", `You have successfully updated your ${_field}.`);
+          if(_field === 'Specialization')
+            this.selectedFaculty.specializations = _data;
+          else
+          this.selectedFaculty[_field.toLowerCase().replace(' ', '_')] = _data;
+        }
         else
           // throw new Error('Failed to update profile');
         myDialog.negative(this.$q, "Update Failed", `Failed to update your ${_field}. Please try again later.`);
@@ -464,7 +553,7 @@ export default defineComponent({
     getResearchinterest (s) {
       return String(s || '').split(';').map(x => x.trim()).filter(Boolean) || []
     },
-    parsedSpecializations(s) {
+    parsedSpecializations(specString) {
       if (!specString || typeof specString !== 'string') return []
         return specString
           .split(';')
@@ -474,7 +563,23 @@ export default defineComponent({
             key: key.trim(),
             value: value.trim()
           }))
+    }, 
+  },
+  computed: {
+    parsedSpecializationsDialog() {
+      if (!this.message || typeof this.message !== 'string') return []
+        return this.message
+          .split(';')
+          .map(pair => pair.split(':'))
+          .filter(parts => parts.length === 2)
+          .map(([key, value]) => ({
+            key: key.trim(),
+            value: value.trim()
+          }))
     },
+    getSpecializationsDialog() {
+      return String(this.message || '').split(';').map(x => x.trim()).filter(Boolean) || []
+    },   
   },
   data() {
     return {
@@ -502,6 +607,7 @@ export default defineComponent({
       showdialog: false,
       message: '',
       field: '',
+      dialogEntry:'',
     }
   }
 });
