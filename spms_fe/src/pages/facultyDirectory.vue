@@ -112,7 +112,10 @@
               :key="i"
           
             >
-            {{spec}}
+            <!-- {{spec}} -->
+
+             {{ (!hasColon(spec))?toTitleCase(spec):'' }}             
+             <strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[0])+':':''}}</strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[1]):'' }}
            </span>
            </div>
 
@@ -124,7 +127,10 @@
               :key="i"
           
             >
-            {{spec}}
+            <!-- {{spec}} -->
+
+             {{ (!hasColon(spec))?toTitleCase(spec):'' }}             
+             <strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[0])+':':''}}</strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[1]):'' }}
            </span>
            </div>
 
@@ -135,7 +141,10 @@
               :key="i"
           
             >
-            {{spec}}
+            <!-- {{spec}} -->
+
+             {{ (!hasColon(spec))?toTitleCase(spec):'' }}             
+             <strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[0])+':':''}}</strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[1]):'' }}
            </span>
            </div>
 
@@ -154,7 +163,10 @@
               :key="i"
           
             >
-            {{spec}}
+            <!-- {{spec}} -->
+
+             {{ (!hasColon(spec))?toTitleCase(spec):'' }}             
+             <strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[0])+':':''}}</strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[1]):'' }}
            </span>
            </div>
 
@@ -166,7 +178,10 @@
               :key="i"
           
             >
-            {{spec}}
+            <!-- {{spec}} -->
+
+             {{ (!hasColon(spec))?toTitleCase(spec):'' }}             
+             <strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[0])+':':''}}</strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[1]):'' }}
            </span>
            </div>
         
@@ -177,7 +192,10 @@
               :key="i"
           
             >
-            {{spec}}
+            <!-- {{spec}} -->
+
+             {{ (!hasColon(spec))?toTitleCase(spec):'' }}             
+             <strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[0])+':':''}}</strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[1]):'' }}
            </span>
            </div>
       </div>
@@ -387,7 +405,7 @@ function onLogin() {
       const userData = decodeCredential(response.credential);
       let SID = {};
       SID.userEmail = userData.email; 
-      // SID.userEmail = 'juniven.acapulco@msugensan.edu.ph'   // For testing purposes, hardcoding the email
+      SID.userEmail = 'andrew.ruiz@msugensan.edu.ph'   // For testing purposes, hardcoding the email
       SID.name = userData.name;
       SID.picture = userData.picture;
       let faculty = facultyList.value.find(faculty => faculty.email_address === SID.userEmail);

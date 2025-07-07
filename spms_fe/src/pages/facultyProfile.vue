@@ -46,10 +46,23 @@
        <h3 class="text-weight-bold">Contact Information</h3>
         
        
-        <p class="email">📧 {{ selectedFaculty.email_address }}</p>
+        <div class="email">📧 {{ selectedFaculty.email_address }}</div>
         
-            <p>            
-              📞 {{ selectedFaculty.phone }}
+            <div class="span-container" style="margin-left: -10px;">            
+              📞 
+              <!-- {{ selectedFaculty.phone }} -->
+      <!-- <div class="span-container" > -->
+         <div
+              v-for="(spec, i) in getSpecializations(selectedFaculty.phone)"
+              :key="i"
+          
+            >            
+             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
+             <span v-else>
+              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
+             </span>             
+            </div>
+      <!-- </div>                     -->
                 <q-btn
                 icon="edit"
                 size="sm"
@@ -59,7 +72,7 @@
                 color="primary"
                 @click="showdialog = true; field='Phone'; message = selectedFaculty.phone"
               />                
-            </p>
+           </div>
             <p>
               🔗 <a :href="selectedFaculty.linked_in" class="text-blue-600 underline" target="_blank">Linked In</a>
               <q-btn
@@ -276,7 +289,10 @@
               :key="i"
           
             >
-            {{spec}}
+            <!-- {{spec}} -->
+
+             {{ (!hasColon(spec))?toTitleCase(spec):'' }}             
+             <strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[0])+':':''}}</strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[1]):'' }}
            </span>
            </div>
 
@@ -296,13 +312,17 @@
                         />              
              </h3>
               <div class="span-container">
-           <span
+           <div
               v-for="(spec, i) in getResearchinterest(selectedFaculty.research_interest)"
               :key="i"
           
             >
-            {{spec}}
-           </span>
+            <!-- {{spec}} -->
+             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
+             <span v-else>
+              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
+             </span>               
+           </div>
            </div>
 
           <h3 class="text-weight-bold">Research
@@ -320,13 +340,17 @@
                         />
           </h3>
               <div class="span-container">
-           <span
+           <div
               v-for="(spec, i) in getResearchinterest(selectedFaculty.research)"
               :key="i"
           
             >
-            {{spec}}
-           </span>
+            <!-- {{spec}} -->
+             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
+             <span v-else>
+              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
+             </span>               
+           </div>
            </div>
 
 
@@ -352,13 +376,17 @@
                         />                   
             </h3>
               <div class="span-container">
-           <span
+           <div
               v-for="(spec, i) in getResearchinterest(selectedFaculty.extensions)"
               :key="i"
           
             >
-            {{spec}}
-           </span>
+            <!-- {{spec}} -->
+             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
+             <span v-else>
+              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
+             </span>               
+           </div>
            </div>
 
 
@@ -377,13 +405,17 @@
                         />                            
               </h3>
                <div class="span-container">
-           <span
+           <div
               v-for="(spec, i) in getSpecializations(selectedFaculty.publication)"
               :key="i"
           
             >
-            {{spec}}
-           </span>
+            <!-- {{spec}} -->
+             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
+             <span v-else>
+              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
+             </span>               
+           </div>
            </div>
         
               <h3 class="text-weight-bold">Affiliations
@@ -401,13 +433,17 @@
                         />                         
               </h3>
                <div class="span-container">
-           <span
+           <div
               v-for="(spec, i) in getSpecializations(selectedFaculty.affiliation)"
               :key="i"
           
             >
-            {{spec}}
-           </span>
+            <!-- {{spec}} -->
+             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
+             <span v-else>
+              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
+             </span>               
+           </div>
            </div>
       </div>
  </div>
