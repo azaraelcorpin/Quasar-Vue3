@@ -10,9 +10,9 @@ function handleRouteNavigationAndTitleChange(to, from, next) {
   const { cookies } = useCookies();
 
   document.title = process.env.VUE_APP_NAME + '-' + to.meta.title;
-  
-  if (to.name === 'signIn'|| to.name === 'accessDenied' || to.name === 'catchAll' || cookies.isKey('_UID_') || to.name === 'facultyProfile' || to.name === 'facultyDirectory') {
-    
+
+  if (to.name === 'signIn'|| to.name === 'accessDenied' || to.name === 'dashboard' || cookies.isKey('_UID_') || to.name === 'facultyProfile' || to.name === 'facultyDirectory') {
+
     if(cookies.isKey('_UID_') && !(to.name === 'signIn'|| to.name === 'accessDenied' || to.name === 'catchAll'))
       checkRoles(to,from,next)
     else
@@ -45,7 +45,7 @@ function checkRoles(to, from, next) {
             next(false);
           else
             next({name:'dashboard'})
-        }) ;      
+        }) ;
     }
   } else {
     // No specific roles required for this route, allow access

@@ -1,42 +1,37 @@
 <template>
-  <!-- <router-view /> -->
-  <!-- <div v-if="toFaculty==0">
-      <main-layout>
-          <router-view />
-      </main-layout>
-   </div> -->
-   <faculty-directory v-if="toFaculty==2" />
-   <faculty-Profile v-else />
+  <q-layout view="hHh lpR fFf">
+
+    <!-- Header -->
+    <q-header elevated class="bg-primary text-white">
+      <q-toolbar>
+        <q-toolbar-title>
+          <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+          <img src="./assets/logo.png" style="height: 40px;  margin-right: 10px; margin-left: 10px; margin-bottom: 10px;"  />
+              <img
+                src="./assets/bannerType.png"
+                style="height: auto;"
+              />
+            </div>
+        </q-toolbar-title>
+      </q-toolbar>
+    </q-header>
+
+    <!-- Required -->
+    <q-page-container>
+      <router-view />
+    </q-page-container>
+
+    <q-footer class="bg-primary text-white text-center">
+      <div class="q-pa-sm">
+        &copy; 2026 MSU-Gensan. All rights reserved.
+      </div>
+    </q-footer>
+
+  </q-layout>
 </template>
 
 <script>
-import { defineComponent,watch } from 'vue'
-// import MainLayout from './layouts/MainLayout.vue';
-import facultyDirectory from './pages/facultyDirectory.vue';
-import facultyProfile from './pages/facultyProfile.vue';
-
-
-export default defineComponent({
-    name: 'App',
-    components:{
-      // MainLayout,
-      facultyDirectory,
-      facultyProfile
-    },
-    watch: {
-    // Watch $route.path (reactive in Vue Router)
-    '$route.path'(newPath) {
-      if (newPath === '/facultyProfile') 
-        this.toFaculty = 1
-      else
-        this.toFaculty = 2
-      }
-    
-  },
-    data() {
-      return {
-        toFaculty: 2
-      }
-    },
-})
+export default {
+  name: 'MainLayout'
+}
 </script>

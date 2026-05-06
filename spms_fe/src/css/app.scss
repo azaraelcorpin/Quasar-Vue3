@@ -2,3 +2,31 @@
 .swal-overlay {
     z-index: 9999 !important;
   }
+
+  @font-face {
+  font-family: "Friz Quadrata Std";
+  src: url("/fonts/friz-quadrata-std-medium") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Friz Quadrata Std";
+  src: url("/fonts/friz-quadrata-std-italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Friz Quadrata Std";
+  src: url("/fonts/friz-quadrata-std-bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: bold;
+}
+
+@font-face {
+  font-family: "Friz Quadrata Std";
+  src: url("/fonts/friz-quadrata-std-bold-italic.otf") format("opentype");
+  font-weight: 700;
+  font-style: bold italic;
+}

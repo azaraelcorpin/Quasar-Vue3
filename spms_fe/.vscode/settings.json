@@ -6,6 +6,8 @@
   "editor.codeActionsOnSave": [
     "source.fixAll.eslint"
   ],
+  "editor.folding": true,
+  "editor.showFoldingControls": "always",
   "eslint.validate": [
     "javascript",
     "javascriptreact",
