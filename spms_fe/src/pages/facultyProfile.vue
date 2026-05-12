@@ -1,685 +1,382 @@
 <template>
-<div id="app-container">
-<div class="header">
-  <div class="logo">
-</div>
-<div class="login">
-  
-<button class="login-btn" @click="logout()" id="">Logout</button>
-</div>
+  <q-page class="bg-grey-2">
 
-</div>
+    <div class="page-container">
 
-<header>
-    <h1>Faculty Profile</h1>
-  </header>
-   <section class="container">
+    <!-- HERO SECTION -->
+    <div class="hero-section">
+      <div class="hero-overlay q-pa-xl ">
 
-  
- <div class="profile">
-
-
- <!-- <button @click="goBack" class="mb-4 text-blue-600 underline">
-        ← Back to Directory
-      </button> -->
-
- <div class="profile-card">
-
-  
-    <div class="profile-left">
- 
-     <transition name="fade">
-          <img  
-            :src="selectedFaculty.pic"   
-            @error="onImageError"
-            alt="Faculty Photo"
-            class="w-40 h-40 rounded-lg object-cover profile-photo" />
-        </transition>
-      <div class="contact-info">
-       <h3 class="text-weight-bold">Department</h3>
-          <p>{{ toTitleCase(selectedFaculty.deptname) }}</p>
-          <h3 class="text-weight-bold">College</h3>
-  <p>{{ toTitleCase(selectedFaculty.collname) }}</p>
-
-  <br/>
-
-       <h3 class="text-weight-bold">Contact Information</h3>
-        
-       
-        <div class="email">📧 {{ selectedFaculty.email_address }}</div>
-        
-            <div class="span-container" style="margin-left: -10px;">            
-              📞 
-              <!-- {{ selectedFaculty.phone }} -->
-      <!-- <div class="span-container" > -->
-         <div
-              v-for="(spec, i) in getSpecializations(selectedFaculty.phone)"
-              :key="i"
-          
-            >            
-             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
-             <span v-else>
-              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
-             </span>             
-            </div>
-      <!-- </div>                     -->
-                <q-btn
-                icon="edit"
-                size="sm"
-                round
-                dense
-                flat
-                color="primary"
-                @click="showdialog = true; field='Phone'; message = selectedFaculty.phone"
-              />                
-           </div>
-            <p>
-              🔗 <a :href="selectedFaculty.linked_in" class="text-blue-600 underline" target="_blank">Linked In</a>
-              <q-btn
-                icon="edit"
-                size="sm"
-                round
-                dense
-                flat
-                color="primary"
-                @click="showdialog = true; field='Linked In'; message = selectedFaculty.linked_in"
-              />   
-            </p>
-
-            <p>
-              🔗 <a :href="selectedFaculty.google_scholar" class="text-blue-600 underline" target="_blank">Google Scholar</a>
-                            <q-btn
-                icon="edit"
-                size="sm"
-                round
-                dense
-                flat
-                color="primary"
-                @click="showdialog = true; field='Google Scholar'; message = selectedFaculty.google_scholar"
-              />   
-            </p>
-      </div>
-     </div>
-
-      <div class="profile-right">
-      <h1 class="fname text-h5 text-weight-bold">{{ toTitleCase(selectedFaculty.facname) }}</h1>
-        <h2 class="text-subtitle1 text-weight-bold">{{toTitleCase(selectedFaculty.currentrank)  }}</h2>
-
-       <!-- <p class="mt-4 text-gray-700">{{ selectedFaculty.email }}</p> -->
-       <h3 class="text-weight-bold">Specializations 
-        <q-btn
-          icon="edit"
-          size="sm"
-          round
-          dense
-          flat
-          color="primary"
-          @click="showdialog = true; field='Specialization'; message = (String(selectedFaculty.specializations)||'').split(';')
-                          .map(item => item.trim())
-                          .filter(Boolean)
-                          .join(';\n\n')"
-        />
-      </h3>
-  
-
-  <q-dialog v-model="showdialog" persistent>
-      <q-card  style="overflow-x: hidden; word-break: break-word; width: 50%; padding-inline: 20px;">
-        <q-card-section>
-          <div class="text-h6">Update {{ field }}</div>
-        </q-card-section>
-<!-- {{ message }} -->
-      <!-- <div class="span-container" v-if="hasColon(message)">
- 
-        <span
-          v-for="(item, i) in parsedSpecializationsDialog"
-          :key="i"
-          class="spec-line"
+        <q-chip
+          color="warning"
+          text-color="dark"
+          icon="school"
+          style="width: fit-content;"
         >
-          <strong>{{ item.key }}:</strong> {{ toTitleCase(item.value) }}
-          <q-icon
-            name="delete"
-            class="cursor-pointer"
-            @click="() =>{
-              const specs = message.split(';').map(x => x.trim()).filter(Boolean);
-              specs.splice(i, 1);
-              message = specs.join('; ');
-              console.log('Updated entry:', message);
-            }"
-            size="16px"
-            color="primary"
-            ></q-icon>
-            <q-icon
-                name="edit"
-                class="cursor-pointer"
-                @click="() => {
-                  dialogEntry = item.key + ': ' + item.value;
-                  const specs = message.split(';').map(x => x.trim()).filter(Boolean);
-                  specs.splice(i, 1);
-                  message = specs.join('; ');
-                  console.log('Updated entry:', message);
-                }"
-                size="16px"
-                color="primary"
-              ></q-icon>
-        </span>
-      </div> -->
+          {{ faculty.deptname }}
+        </q-chip>
 
-      
-      <div class="span-container">
-         <span
-              v-for="(spec, i) in getSpecializationsDialog"
-              :key="i"
-          
+        <div class="text-h4 text-weight-bold text-white q-mt-md">
+          {{ faculty.facultyname }}
+        </div>
+
+        <div class="text-h6 text-warning">
+          {{ faculty.currentrank }}
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- MAIN CONTENT -->
+    <div class="row q-col-gutter-lg q-pa-sm">
+
+      <!-- LEFT PROFILE CARD -->
+      <div class="col-12 col-md-4">
+        <q-card flat bordered class="profile-card">
+
+          <!-- Profile Picture -->
+          <q-card-section class="text-center">
+
+            <q-avatar
+              square
+              size="180px"
+              class="faculty-avatar"
             >
-            <!-- {{toTitleCase(spec)}} -->
-             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
-             <span v-else>
-              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
-             </span>
-                <q-icon
-                      name="delete"
-                      class="cursor-pointer"
-                      @click="() =>{
-                        const specs = message.split(';').map(x => x.trim()).filter(Boolean);
-                        specs.splice(i, 1);
-                        message = specs.join('; ');
-                        console.log('Updated entry:', message);
-                      }"
-                      size="16px"
-                      color="primary"
-                ></q-icon>
-                <q-icon
-                      name="edit"
-                      class="cursor-pointer"
-                      @click="() => {
-                        dialogEntry = spec;
-                        const specs = message.split(';').map(x => x.trim()).filter(Boolean);
-                        specs.splice(i, 1);
-                        message = specs.join('; ');
-                        console.log('Updated entry:', message);
-                      }"
-                      size="16px"
-                      color="primary"
-              ></q-icon>
-           </span>
-      </div>
-        
-        <q-card-section style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-          <!-- with rules no double colon -->
-          <q-input style="width: 100%;"
-            v-model="dialogEntry"
-            type="text"
-            autogrow
-            autofocus
-            :rules="[
-              val => !val.includes('::') || 'Entry cannot contain double colon'
-            ]"   
-                     
-          />
-          <q-btn
-            icon="add"
-            color="primary"
-            flat
-            :disable="dialogEntry.includes('::')||dialogEntry.trim() === ''"
-            @click="() => {
-              const specs = message?.split(';').map(x => x.trim()).filter(Boolean)||[];
-              if (dialogEntry.trim()) {
-                specs.push(dialogEntry.trim());
-                message = specs.join('; ');
-                dialogEntry = '';
-              }
-            }"></q-btn>
-          
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" @click="dialogEntry=''" v-close-popup />
-          <q-btn flat label="Save" color="primary" @click="handlesFacultyUpdate(field,String(message))" :disable="dialogEntry!==''" />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
-
-<!-- <div class="span-container" v-if="hasColon(selectedFaculty.specializations)">
- 
-        <span
-          v-for="(item, i) in parsedSpecializations(selectedFaculty.specializations)"
-          :key="i"
-          class="spec-line"
-        >
-          <strong>{{ item.key }}:</strong> {{ toTitleCase(item.value) }}
-        </span>
-      </div> -->
-
-      
-      <div class="span-container" v-if="selectedFaculty.specializations && selectedFaculty.specializations.length > 0">
-         <div
-              v-for="(spec, i) in getSpecializations(selectedFaculty.specializations)"
-              :key="i"
-          
-            >
-            <!-- {{toTitleCase(spec)}} -->
-             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
-             <span v-else>
-              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
-             </span>             
-            </div>
-      </div>
-      <div v-else>
-        No specializations listed.
-      </div>
- 
-   
-           <h3 class="text-weight-bold">Education
-                  <q-btn
-                icon="edit"
-                size="sm"
-                round
-                dense
-                flat
-                color="primary"
-                @click="showdialog = true; field='Education'; message = (String(selectedFaculty.education)||'').split(';')
-                          .map(item => item.trim())
-                          .filter(Boolean)
-                          .join(';\n\n')"
+              <img
+                :src="faculty.pic"
+                @error="onImageError"
               />
-           </h3>
-            <div class="span-container">
-           <span
-              v-for="(spec, i) in getSpecializations(selectedFaculty.education)"
-              :key="i"
-          
-            >
-            <!-- {{spec}} -->
+            </q-avatar>
 
-             {{ (!hasColon(spec))?toTitleCase(spec):'' }}             
-             <strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[0])+':':''}}</strong>{{  (hasColon(spec))?toTitleCase(spec.split(':')[1]):'' }}
-           </span>
-           </div>
+            <div class="q-mt-md">
+              <q-chip
+                color="warning"
+                text-color="dark"
+                icon="menu_book"
+              >
+                {{ faculty.deptname }}
+              </q-chip>
+            </div>
 
+          </q-card-section>
 
-             <h3 class="text-weight-bold">Research Interests
-                        <q-btn
-                          icon="edit"
-                          size="sm"
-                          round
-                          dense
-                          flat
-                          color="primary"
-                          @click="showdialog = true; field='Research Interest'; message = (String(selectedFaculty.research_interest)||'').split(';')
-                          .map(item => item.trim())
-                          .filter(Boolean)
-                          .join(';\n\n')"
-                        />              
-             </h3>
-              <div class="span-container">
-           <div
-              v-for="(spec, i) in getResearchinterest(selectedFaculty.research_interest)"
-              :key="i"
-          
-            >
-            <!-- {{spec}} -->
-             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
-             <span v-else>
-              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
-             </span>               
-           </div>
-           </div>
+          <q-separator />
 
-          <h3 class="text-weight-bold">Research
-                              <q-btn
-                          icon="edit"
-                          size="sm"
-                          round
-                          dense
-                          flat
-                          color="primary"
-                          @click="showdialog = true; field='Research'; message = (String(selectedFaculty.research)||'').split(';')
-                          .map(item => item.trim())
-                          .filter(Boolean)
-                          .join(';\n\n')"
-                        />
-          </h3>
-              <div class="span-container">
-           <div
-              v-for="(spec, i) in getResearchinterest(selectedFaculty.research)"
-              :key="i"
-          
-            >
-            <!-- {{spec}} -->
-             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
-             <span v-else>
-              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
-             </span>               
-           </div>
-           </div>
+          <!-- Basic Information -->
+          <q-card-section>
 
+            <div class="info-item q-mb-md">
+              <q-icon
+                name="apartment"
+                color="primary"
+                size="sm"
+              />
+              <div>
+                <div class="text-caption text-grey">
+                  College
+                </div>
+                <div class="text-body1">
+                  {{ faculty.collname }}
+                </div>
+              </div>
+            </div>
 
-   
+            <div class="info-item q-mb-md">
+              <q-icon
+                name="badge"
+                color="primary"
+                size="sm"
+              />
+              <div>
+                <div class="text-caption text-grey">
+                  Employee ID
+                </div>
+                <div class="text-body1">
+                  {{ faculty.id }}
+                </div>
+              </div>
+            </div>
 
+          </q-card-section>
 
+          <q-separator />
 
+          <!-- Contact -->
+          <q-card-section>
+            <div class="text-subtitle1 text-weight-bold q-mb-md">
+              Contact Information
+            </div>
 
+            <q-list bordered separator>
 
+              <q-item>
+                <q-item-section avatar>
+                  <q-icon
+                    name="email"
+                    color="primary"
+                  />
+                </q-item-section>
 
-            <h3 class="text-weight-bold">Extensions
-                        <q-btn
-                          icon="edit"
-                          size="sm"
-                          round
-                          dense
-                          flat
-                          color="primary"
-                          @click="showdialog = true; field='Extensions'; message = (String(selectedFaculty.extensions)||'').split(';')
-                          .map(item => item.trim())
-                          .filter(Boolean)
-                          .join(';\n\n')||''"
-                        />                   
-            </h3>
-              <div class="span-container">
-           <div
-              v-for="(spec, i) in getResearchinterest(selectedFaculty.extensions)"
-              :key="i"
-          
-            >
-            <!-- {{spec}} -->
-             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
-             <span v-else>
-              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
-             </span>               
-           </div>
-           </div>
+                <q-item-section style="overflow-wrap: anywhere;">
+                  {{ faculty.email_address }}
+                </q-item-section>
+              </q-item>
 
+              <!-- LinkedIn -->
+              <q-item
+                clickable
+                tag="a"
+                href="https://www.linkedin.com/in/your-profile"
+                target="_blank"
+              >
+                <q-item-section avatar>
+                  <q-icon name="link" color="primary" />
+                </q-item-section>
 
-              <h3 class="text-weight-bold">Publications
-                        <q-btn
-                          icon="edit"
-                          size="sm"
-                          round
-                          dense
-                          flat
-                          color="primary"
-                          @click="showdialog = true; field='Publication'; message = (String(selectedFaculty.publication)||'').split(';')
-                          .map(item => item.trim())
-                          .filter(Boolean)
-                          .join(';\n\n')"
-                        />                            
-              </h3>
-               <div class="span-container">
-           <div
-              v-for="(spec, i) in getSpecializations(selectedFaculty.publication)"
-              :key="i"
-          
-            >
-            <!-- {{spec}} -->
-             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
-             <span v-else>
-              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
-             </span>               
-           </div>
-           </div>
-        
-              <h3 class="text-weight-bold">Affiliations
-                        <q-btn
-                          icon="edit"
-                          size="sm"
-                          round
-                          dense
-                          flat
-                          color="primary"
-                          @click="showdialog = true; field='Affiliation'; message = (String(selectedFaculty.affiliation)||'').split(';')
-                          .map(item => item.trim())
-                          .filter(Boolean)
-                          .join(';\n\n')"
-                        />                         
-              </h3>
-               <div class="span-container">
-           <div
-              v-for="(spec, i) in getSpecializations(selectedFaculty.affiliation)"
-              :key="i"
-          
-            >
-            <!-- {{spec}} -->
-             <span v-if="!hasColon(spec)">{{toTitleCase(spec)}}</span>
-             <span v-else>
-              <strong>{{toTitleCase(spec.split(':')[0]) }}:</strong> {{ toTitleCase(spec.split(':')[1]) }}
-             </span>               
-           </div>
-           </div>
+                <q-item-section>
+                  LinkedIn
+                </q-item-section>
+              </q-item>
+
+              <!-- Google Scholar -->
+              <q-item
+                clickable
+                tag="a"
+                href="https://scholar.google.com/citations?user=your-id"
+                target="_blank"
+              >
+                <q-item-section avatar>
+                  <q-icon name="link" color="primary" />
+                </q-item-section>
+
+                <q-item-section>
+                  Google Scholar
+                </q-item-section>
+              </q-item>
+
+            </q-list>
+          </q-card-section>
+
+        </q-card>
       </div>
- </div>
- </div>
- 
-    </section>
-   </div>
- <footer class="app-footer">
-      <p>&copy; 2025 Mindanao State University General Santos. All rights reserved.</p>
-    </footer>
+
+
+      <!-- RIGHT CONTENT -->
+      <div class="col-12 col-md-8">
+
+        <q-card
+          v-for="section in sections"
+          :key="section.title"
+          class="q-mb-lg"
+          flat
+          bordered
+        >
+          <!-- Header -->
+          <q-card-section class="row items-center">
+            <q-icon
+              :name="section.icon"
+              color="primary"
+              class="q-mr-sm"
+            />
+
+            <div class="text-h6 text-primary">
+              {{ section.title }}
+            </div>
+          </q-card-section>
+
+          <q-separator />
+
+          <!-- With Data -->
+          <q-list v-if="section.items.length">
+
+            <q-item
+              v-for="(item, index) in section.items"
+              :key="index"
+            >
+              <q-item-section avatar>
+                <q-icon
+                  name="fiber_manual_record"
+                  size="xs"
+                  color="primary"
+                />
+              </q-item-section>
+
+              <q-item-section>
+                {{ item }}
+              </q-item-section>
+            </q-item>
+
+          </q-list>
+
+          <!-- No Data -->
+          <q-card-section
+            v-else
+            class="text-center text-grey"
+          >
+            <q-icon
+              name="info"
+              size="md"
+              class="q-mb-sm"
+            />
+
+            <div>
+              No {{ section.title.toLowerCase() }} available.
+            </div>
+          </q-card-section>
+
+        </q-card>
+
+      </div>
+    </div>
+    </div>
+  </q-page>
 </template>
 
 <script>
-import { defineComponent } from 'vue'
-import { decodeCredential } from 'vue3-google-login';
-import api from "src/API/api";
-import { useCookies } from "vue3-cookies";
-import { useQuasar } from 'quasar';
-import myDialog from 'src/plugins/myDialog';
-import { useRouter } from 'vue-router';
-import axios from 'axios';
+export default {
+  name: "FacultyProfilePage",
 
-export default defineComponent({
-  name: 'facultyProfile',
-  mounted() {
-    // this.onLogin(); // ← call it here
-    this.$q.loading.show({
-      message: 'Loading Profile...',
-      spinnerSize: 50,
-      spinnerColor: 'primary',
-      backgroundColor: 'white',
-      messageColor: 'primary'
-    });
-
-    if(this.cookies.isKey('_UID_')) {
-      this.SID = JSON.parse(JSON.stringify(this.cookies.get('_UID_')));
-      console.log('SID', this.SID.userEmail);
-
-      this.onLogin(this.SID.userEmail);
-          setTimeout(() => {
-          this.$q.loading.hide()
-        }, 3000)
-    } else {
-          setTimeout(() => {
-          this.$q.loading.hide()
-        }, 3000)
-        this.$router.push({ name: 'facultyDirectory' });
-    }
-  },
-  setup() {
-    const { cookies } = useCookies();
-    const $q = useQuasar();
-    const router = useRouter();
-    return {
-      cookies,
-      
-    }
-  },
-  methods: {
-    async onLogin(userEmail) {
-      const res = await api.getAllFaculty()
-      if(res.error) {
-        this.cookies.remove('_UID_');
-        this.SID = {};        
-        myDialog.negative($q, "Error", res.error);
-        this.$router.push({ name: 'facultyDirectory' });
-        return;
-      }
-      let facultyList = res.FacultyList??[]
-      console.log('facultyList', facultyList);
-      let faculty = facultyList.find(faculty => faculty.email_address === userEmail);
-      if (faculty) {
-        this.selectedFaculty = {
-          faculty_id: faculty.id,
-          pic: faculty.pic || 'images/default.png',
-          facname: faculty.facname,
-          currentrank: faculty.currentrank,
-          email: faculty.email_address,
-          deptname: faculty.deptname,
-          collname: faculty.collname,
-          email_address: faculty.email_address,
-          phone: faculty.phone,
-          linkedin: faculty.linkedin,
-          google_scholar: faculty.google_scholar,
-          specializations: faculty.specializations || '',
-          education: faculty.education || [],
-          research_interest: faculty.research_interest || [],
-          research: faculty.research || [],
-          extensions: faculty.extensions || [],
-          publication: faculty.publication || [],
-          affiliation: faculty.affiliation || []
-        };
-      } else {
-        console.error('Faculty not found');
-      }
-    },
-    async handlesFacultyUpdate(_field, _data) {
-      this.showdialog = false;
-      // let resp = await api.updateFacultyProfile(this.SID, this.selectedFaculty);
-      try {
-        await myDialog.confirm(this.$q, "Update Confirmation", `Are you sure you want to update your ${_field}?`)
-        this.$q.loading.show({  // Show loading dialog
-            message: 'Updating Profile...',
-            spinnerSize: 50,
-            spinnerColor: 'primary',
-            backgroundColor: 'white',
-            messageColor: 'primary'
-          });
-        let resp = await api.updateFacultyProfile(_field.toLowerCase().replace(' ', '_'), _data.replace(/\n/g, ' '), this.selectedFaculty.faculty_id);
-        console.log('resp', resp);
-        if (resp.statusCode === "200"){
-          myDialog.positive(this.$q, "Update Successful", `You have successfully updated your ${_field}.`);
-          if(_field === 'Specialization')
-            this.selectedFaculty.specializations = _data;
-          else
-          this.selectedFaculty[_field.toLowerCase().replace(' ', '_')] = _data;
-        }
-        else
-          // throw new Error('Failed to update profile');
-        myDialog.negative(this.$q, "Update Failed", `Failed to update your ${_field}. Please try again later.`);
-      } catch (error) {
-        this.$q.loading.hide(); // Hide loading dialog
-        return
-      }
-      this.$q.loading.hide(); // Hide loading dialog
-    },
-    logout() {
-      this.cookies.remove('_UID_');
-      this.SID = {};
-      myDialog.positive(this.$q, "Logged Out", "You have successfully logged out.");
-      console.log('Logged out');
-        this.$router.push({ name: 'facultyDirectory' });
-    },
-    toTitleCase (str) {
-        return str
-          .split(' ')  
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())  
-          .join(' '); 
-      },
-    onImageError(event) {
-      event.target.src = 'images/default.png' // Default image URL
-    },
-    hasColon(str) {
-      return str.includes(':');
-    },
-    getSpecializations(s) {
-      return String(s || '').split(';').map(x => x.trim()).filter(Boolean) || []
-    },
-    getResearchinterest (s) {
-      return String(s || '').split(';').map(x => x.trim()).filter(Boolean) || []
-    },
-    parsedSpecializations(specString) {
-      if (!specString || typeof specString !== 'string') return []
-        return specString
-          .split(';')
-          .map(pair => pair.split(':'))
-          .filter(parts => parts.length === 2)
-          .map(([key, value]) => ({
-            key: key.trim(),
-            value: value.trim()
-          }))
-    }, 
-  },
-  computed: {
-    parsedSpecializationsDialog() {
-      if (!this.message || typeof this.message !== 'string') return []
-        return this.message
-          .split(';')
-          .map(pair => pair.split(':'))
-          .filter(parts => parts.length === 2)
-          .map(([key, value]) => ({
-            key: key.trim(),
-            value: value.trim()
-          }))
-    },
-    getSpecializationsDialog() {
-      return String(this.message || '').split(';').map(x => x.trim()).filter(Boolean) || []
-    },   
-  },
   data() {
     return {
-      SID:{},
-      // Data properties go here
-      selectedFaculty: {
-        pic: '',
-        facname: '',
-        currentrank: '',
-        email: '',
-        deptname: '',
-        collname: '',
-        email_address: '',
-        phone: '',
-        linked_in: '',
-        google_scholar: '',
-        specializations: '',
-        education:'',
-        research_interest: '',
-        research: '',
-        extensions: '',
-        publication: '',
-        affiliation: ''
+      faculty: {
+        email_address: "rohanifah.abdulrahman@msugensan.edu.ph",
+        currentrank: "ASSISTANT PROFESSOR",
+        deptcode: "IS",
+        id: "118-1025",
+        facname: "ROHANIFAH ABDUL-RAHMAN",
+        pic: "images/118-1025.jpg",
+        facultyname: "ABDUL-RAHMAN, ROHANIFAH",
+        lastname: "ABDUL-RAHMAN",
+        deptname: "ISLAMIC STUDIES",
+        collname: "INSTITUTE OF ISLAMIC, ARABIC & IT'L STUD"
       },
-      showdialog: false,
-      message: '',
-      field: '',
-      dialogEntry:'',
+
+      facultySections: {
+        specializations: [
+          "Islamic Jurisprudence",
+          "Quranic Studies",
+          "Islamic Philosophy"
+        ],
+
+        researchInterests: [],
+
+        research: [
+          "Islamic Banking Systems in Southeast Asia (2023)"
+        ],
+
+        publications: [],
+
+        affiliations: [],
+
+        extension: []
+      }
+    }
+  },
+
+  computed: {
+    sections() {
+      return [
+        {
+          title: "Specializations",
+          icon: "psychology",
+          items: this.facultySections.specializations
+        },
+        {
+          title: "Research Interests",
+          icon: "search",
+          items: this.facultySections.researchInterests
+        },
+        {
+          title: "Research",
+          icon: "article",
+          items: this.facultySections.research
+        },
+        {
+          title: "Publications",
+          icon: "menu_book",
+          items: this.facultySections.publications
+        },
+        {
+          title: "Affiliations",
+          icon: "groups",
+          items: this.facultySections.affiliations
+        },
+        {
+          title: "Extension",
+          icon: "volunteer_activism",
+          items: this.facultySections.extension
+        }
+      ]
+    }
+  },
+
+  methods: {
+    onImageError(event) {
+      event.target.src = "images/default.png"
     }
   }
-});
-
+}
 </script>
-<!-- <style>
 
-  .bg {
-    width: 70%;
-    height: 140px;
-    background-image:url('https://facultydirectory.msugensan.edu.ph/assets/msuheader-DC9LfvgY.png');
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    background-color: white;
-    position: relative;
+<style scoped>
+.hero-section {
+  height: 300px;
+  width: 100%;
+  /* background: url('/images/logo.png') center/cover no-repeat; */
+  position: sticky;
+  background-color: white;
+  top: 50px;
+  z-index: 10;
+}
+
+.hero-overlay {
+  height: 100%;
+  background: rgba(114, 4, 85, 0.85);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.profile-card {
+  border-radius: 16px;
+}
+
+.info-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.faculty-avatar,
+.faculty-avatar .q-avatar__content,
+.faculty-avatar img {
+  border-radius: 0 !important;
+}
+
+.faculty-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px !important;
+}
+
+.page-container {
+  width: 65%;
+  margin: 0 auto;
+}
+
+/* tablet */
+@media (max-width: 1024px) {
+  .page-container {
+    width: 85%;
   }
-  .text {
-    position: absolute;
-  bottom: 0;
-  left: 0;
-  color: yellow;
-  font-size: 50px;
-  font-weight: bold;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 10px;
 }
-.top{
-  width: 70%;
-  margin-top: 30px;
+
+/* phone */
+@media (max-width: 600px) {
+  .page-container {
+    width: 100%;
+  }
 }
-</style> -->
-<style scoped src="./faculty-profile.css"></style>
+</style>

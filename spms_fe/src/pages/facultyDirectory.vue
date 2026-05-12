@@ -2,7 +2,7 @@
   <q-page class="bg-grey-2">
 
     <!-- HERO -->
-    <div class="row justify-center">
+  <div class="row justify-center">
       <div class="col-12 col-md-11 col-lg-8">
         <q-card flat class="hero-section">
           <div class="hero-overlay text-center ">
@@ -19,9 +19,9 @@
 
 
     <!-- SEARCH SECTION -->
-    <div class="row justify-center q-px-md q-pb-lg">
-      <div class="col-12 col-md-11 col-lg-11">
-        <q-card class="q-pa-lg">
+    <div class="col-12 col-md-11 col-lg-8">
+      <div class="col-12 col-md-11 col-lg-8">
+        <q-card class="q-pa-lg full-width" >
 
           <!-- Search Input -->
           <div class="row justify-center">
@@ -96,47 +96,74 @@
           <!-- Faculty Cards -->
           <div class="row q-col-gutter-md">
             <div
-              v-for="faculty in filteredFaculty"
+              v-for="faculty in paginatedItems"
               :key="faculty.id"
               class="col-12 col-sm-6 col-md-4"
             >
-              <q-card bordered>
-                <q-card-section class="text-center">
+              <q-card bordered @click="viewProfile(faculty)" class="cursor-pointer">
+                <q-card-section>
+                  <div class=text-center>
+                      <q-avatar
+                        color="primary"
+                        text-color="white"
+                        size="80px"
+                        class="q-mb-md"
+                      >
+                        <!-- {{ faculty.facultyname.charAt(0) }} -->
+                                    <img
+                                    :src="faculty.pic"
+                                    @error="onImageError"
+                                    />
+                      </q-avatar>
 
-                  <q-avatar
-                    color="primary"
-                    text-color="white"
-                    size="60px"
-                    class="q-mb-md"
-                  >
-                    {{ faculty.name.charAt(0) }}
-                  </q-avatar>
 
-                  <div class="text-weight-bold">
-                    {{ faculty.name }}
+                      <div class="text-weight-bold">
+                        {{ faculty.facultyname }}
+                      </div>
                   </div>
 
                   <div class="text-grey-7">
-                    {{ faculty.department }}
+                    <q-icon name="business_center" size="xs" class="q-mr-xs" style="color: #B8860B" />
+                    {{ faculty.deptname }}
                   </div>
 
                   <div class="text-caption text-grey">
-                    {{ faculty.college }}
+                    <q-icon name="account_balance" size="xs" class="q-mr-xs" color="blue" />
+                    {{ faculty.collname }}
                   </div>
 
                 </q-card-section>
               </q-card>
             </div>
+
           </div>
+            <div v-if="showPagination" class="row justify-center q-mt-md">
+              <q-pagination
+                v-model="page"
+                :max="totalPages"
+                direction-links
+                boundary-links
+              />
+            </div>
 
         </q-card>
       </div>
     </div>
-    </div>
+  </div>
   </q-page>
 </template>
 
 <script>
+
+import { ref, computed, onMounted, watch  } from 'vue'
+import axios from 'axios'
+import { decodeCredential } from 'vue3-google-login';
+import api from "src/API/api";
+import { useCookies } from "vue3-cookies";
+import { useQuasar } from 'quasar';
+import myDialog from 'src/plugins/myDialog';
+
+
 export default {
   name: "FacultyDirectory",
 
@@ -146,61 +173,47 @@ export default {
       selectedDepartment: null,
       selectedCollege: null,
       selectedLetter: "ALL",
+      perPage: 9,
+      page: 1,
 
       letters: "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""),
 
-      departments: [
-        "IT Department",
-        "Engineering Department",
-        "Education Department"
-      ],
+      departments: [ ],
 
-      colleges: [
-        "College of Computing",
-        "College of Engineering",
-        "College of Education"
-      ],
+      colleges: [],
 
-      facultyList: [
-        {
-          id: 1,
-          name: "Abdul Rahman",
-          department: "IT Department",
-          college: "College of Computing"
-        },
-        {
-          id: 2,
-          name: "John Smith",
-          department: "Engineering Department",
-          college: "College of Engineering"
-        },
-        {
-          id: 3,
-          name: "Maria Santos",
-          department: "Education Department",
-          college: "College of Education"
-        }
-      ]
+      facultyList: [],
     }
+  },
+
+   methods: {
+    onImageError(event) {
+      event.target.src = 'images/logo.png'
+    },
+    // create a method on card click to navigate to faculty profile page and pass the faculty object as parameter
+    viewProfile(faculty) {
+      this.$router.push({ name: 'facultyProfile', params: { faculty: JSON.stringify(faculty) } })
+    }
+
   },
 
   computed: {
     filteredFaculty() {
       return this.facultyList.filter(faculty => {
         const searchMatch =
-          faculty.name.toLowerCase().includes(this.search.toLowerCase())
+          faculty.facultyname.toLowerCase().includes(this.search.toLowerCase())
 
         const departmentMatch =
           !this.selectedDepartment ||
-          faculty.department === this.selectedDepartment
+          faculty.deptname === this.selectedDepartment
 
         const collegeMatch =
           !this.selectedCollege ||
-          faculty.college === this.selectedCollege
+          faculty.collname === this.selectedCollege
 
         const letterMatch =
           this.selectedLetter === "ALL" ||
-          faculty.name.startsWith(this.selectedLetter)
+          faculty.facultyname.startsWith(this.selectedLetter)
 
         return (
           searchMatch &&
@@ -209,7 +222,53 @@ export default {
           letterMatch
         )
       })
+    },
+    totalPages() {
+      return Math.ceil(this.filteredFaculty.length / this.perPage)
+    },
+    showPagination() {
+      return this.filteredFaculty.length > this.perPage
+    },
+    paginatedItems() {
+      const start = (this.page - 1) * this.perPage
+      const end = start + this.perPage
+      return this.filteredFaculty.slice(start, end)
     }
+  },
+
+  watch: {
+    selectedCollege(newVal) {
+      this.selectedDepartment = null; // Reset department when college changes
+      if (!newVal) {
+        this.departments = this.departments = [...new Set(this.filteredFaculty.map(f => f.deptname))].sort();
+        return
+      }
+
+      const depts = this.filteredFaculty
+        .filter(f => f.collname === newVal)
+        .map(f => f.deptname)
+
+      this.departments = [...new Set(depts)]
+        .sort((a, b) => a.localeCompare(b))
+    }
+  },
+
+
+  async mounted() {
+    // In a real application, you would fetch this data from an API
+    // axios.get('/api/faculty').then(response => {
+    //   this.facultyList = response.data
+    // })
+          const res = await api.getAllFaculty()
+      if(res.error) {
+        myDialog.negative($q, "Error", res.error);
+        return;
+      }
+      this.facultyList = res.FacultyList??[]
+
+    this.departments = [...new Set(this.filteredFaculty.map(f => f.deptname))].sort();
+    this.colleges = [...new Set(this.filteredFaculty.map(f => f.collname))].sort();
+
   }
 }
 </script>
@@ -218,7 +277,7 @@ export default {
 .hero-section {
   height: 300px;
   width: 100%;
-  background: url('../assets/banne1r.png') no-repeat center center;
+  background: url('../assets/banne1r.png') no-repeat center/cover;
   position: relative;
   border-radius: 0 !important;
 }
