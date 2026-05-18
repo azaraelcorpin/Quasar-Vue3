@@ -16,7 +16,8 @@
         </q-toolbar-title>
                     <div class="login">
 
-            <button class="login-btn" @click="onLogin()" id="g_id_signin">Login with Institutional Account</button>
+            <button v-if="!isLoggedIn" class="login-btn" @click="onLogin()" id="g_id_signin">Login with Institutional Account</button>
+            <button v-if="isLoggedIn" class="login-btn" @click="onLogout()">Logout</button>
             </div>
       </q-toolbar>
     </q-header>
@@ -46,9 +47,18 @@ const cookies = useCookies().cookies;
 const $q = useQuasar();
 const router = useRouter();
 
+
+const isLoggedIn = ref(false);
+
 onMounted(() => {
   onLogin();
+
+  window.addEventListener('auth-change', onAuthChange)// Listen for auth changes to update login state from other components (like facultyDirectory.vue)
 });
+function onAuthChange(event) {
+  const email = event.detail.email;
+  isLoggedIn.value = !!email; // Set to true if email exists, false otherwise
+}
 
 function onLogin() {
       if (window.google && window.google.accounts && window.google.accounts.id) {
@@ -70,28 +80,16 @@ function onLogin() {
 
     async function handleCredentialResponse(response) {
       const userData = decodeCredential(response.credential);
-      let SID = {};
-      SID.userEmail = userData.email;
-      // SID.userEmail = 'andrew.ruiz@msugensan.edu.ph'   // For testing purposes, hardcoding the email
-      SID.name = userData.name;
-      SID.picture = userData.picture;
-      let faculty = facultyList.value.find(faculty => faculty.email_address === SID.userEmail);
-      SID.facultyId = faculty ? faculty.id : null;
+      let email = userData.email;
 
-      if (!SID.facultyId) {
-        myDialog.negative($q, "Log In Failed", "Account not found in the system. Please contact the administrator.");
-        return;
-      }
-      console.log('Encoded JWT ID token: ' , SID);
-      let resp = await api.generateSessionId(SID);
-                  console.log('reso',resp)
-      if(resp.error){
-        myDialog.negative($q, "Log In Failed", "Account not found in the system. Please contact the administrator.");
-        cookies.remove('_UID_');
-        return;
-      } else {
-        console.log('Session ID generated:', resp.session);
-        cookies.set('_UID_', JSON.stringify(SID), '1d');
-      }      router.push({ name: 'facultyProfile' });
+      window.dispatchEvent(new CustomEvent('google-login-success', { detail: email }));
+
     }
+
+function onLogout() {
+  cookies.remove('_UID_');
+  localStorage.removeItem('faculty');
+  router.push('/'); // Redirect to home or login page after logout
+  window.dispatchEvent(new CustomEvent('auth-change', { detail: { email: null } })) // Notify layout of logout
+}
 </script>
