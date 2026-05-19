@@ -444,7 +444,7 @@ async function handlesFacultyUpdate(_field, _data) {
             backgroundColor: 'white',
             messageColor: 'primary'
           });
-        let resp = await api.updateFacultyProfile(_field, _data.replace(/\n/g, ' '), faculty.value.faculty_id);
+        let resp = await api.updateFacultyProfile(_field, _data.replace(/\n/g, ' '), faculty.value.id);
         console.log('resp', resp);
         if (resp.statusCode === "200"){
           myDialog.positive($q, "Update Successful", `You have successfully updated your ${_field}.`);
@@ -543,7 +543,7 @@ console.log('UID from cookie:', cookies.get('_UID_'))
         // 2. Notify layout instantly (THIS is the key)
       window.dispatchEvent(
         new CustomEvent('auth-change', {
-          detail: { email: storedFaculty.email }
+          detail: { userEmail: storedFaculty.userEmail }
         })
       )
 }

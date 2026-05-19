@@ -56,8 +56,8 @@ onMounted(() => {
   window.addEventListener('auth-change', onAuthChange)// Listen for auth changes to update login state from other components (like facultyDirectory.vue)
 });
 function onAuthChange(event) {
-  const email = event.detail.email;
-  isLoggedIn.value = !!email; // Set to true if email exists, false otherwise
+  const userEmail = event.detail.userEmail;
+  isLoggedIn.value = !!userEmail; // Set to true if userEmail exists, false otherwise
 }
 
 function onLogin() {
@@ -90,6 +90,6 @@ function onLogout() {
   cookies.remove('_UID_');
   localStorage.removeItem('faculty');
   router.push('/'); // Redirect to home or login page after logout
-  window.dispatchEvent(new CustomEvent('auth-change', { detail: { email: null } })) // Notify layout of logout
+  window.dispatchEvent(new CustomEvent('auth-change', { detail: { userEmail: null } })) // Notify layout of logout
 }
 </script>

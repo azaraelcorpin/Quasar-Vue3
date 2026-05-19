@@ -5,8 +5,8 @@
   <!-- ===================== -->
   <q-page v-if="!faculty" class="bg-grey-2">
 
-    <div class="row justify-center">
 
+    <!-- <div class="row justify-center"> -->
       <div class="col-12 col-md-11 col-lg-8">
 
         <q-card flat class="hero-section">
@@ -22,7 +22,7 @@
         </q-card>
 
       </div>
-
+    <div class="row justify-center">
       <!-- SEARCH SECTION -->
       <div class="col-12 col-md-11 col-lg-8">
 
@@ -48,7 +48,7 @@
           <div class="q-mb-md">
             <div class="text-subtitle2 q-mb-sm">Filter by Letter</div>
 
-            <div class="row q-gutter-xs">
+            <div class="row q-gutter-xs ">
               <q-btn
                 size="md"
                 round
@@ -174,7 +174,6 @@
   <!-- ===================== -->
   <q-page v-else class="bg-grey-2">
 
-        <div class="page-container">
 
 
         <!-- HERO SECTION -->
@@ -202,7 +201,7 @@
           </div>
         </div>
 
-
+<div class="page-container">
         <!-- MAIN CONTENT -->
         <div class="row q-col-gutter-lg q-pa-sm">
 
@@ -480,9 +479,9 @@ function handleLoginSuccess(event) {
   cookies.remove('_UID_')
   localStorage.removeItem('faculty')
 
-  // const email = event.detail
+  const email = event.detail
 
-  const email = 'mario.aguja@msugensan.edu.ph' // TEMPORARY HARDCODED EMAIL FOR TESTING
+  // const email = 'mario.aguja@msugensan.edu.ph' // TEMPORARY HARDCODED EMAIL FOR TESTING
 
   faculty.value =
     facultyList.value.find(f => f.email_address === email) || null
@@ -490,7 +489,7 @@ function handleLoginSuccess(event) {
     console.log('Faculty found:', faculty.value)
 
   if (faculty.value) {
-    const SID = { email: faculty.value.email_address }
+    const SID = { userEmail: faculty.value.email_address }
 
     cookies.set('_UID_', JSON.stringify(SID), '1d')
     localStorage.setItem('faculty', JSON.stringify(faculty.value))
