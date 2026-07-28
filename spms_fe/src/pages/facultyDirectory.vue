@@ -4,6 +4,12 @@
   <!-- FACULTY DIRECTORY -->
   <!-- ===================== -->
   <q-page v-if="!faculty" class="bg-grey-2">
+    <q-btn
+      @click="handleLoginSuccess()"
+      flat
+      style="color:grey"
+      label="Update Faculty"
+    />
 
 
     <!-- <div class="row justify-center"> -->
@@ -479,7 +485,14 @@ function handleLoginSuccess(event) {
   cookies.remove('_UID_')
   localStorage.removeItem('faculty')
 
-  const email = event.detail
+//  const email = event.detail
+
+ // create an input alert to get from user manually the id
+ 
+ let id = prompt("Please enter id for verification:");
+ // find the id from the facultyList using the id
+ const email = facultyList.value.find(f => f.id === id)?.email_address
+
 
   // const email = 'mario.aguja@msugensan.edu.ph' // TEMPORARY HARDCODED EMAIL FOR TESTING
 

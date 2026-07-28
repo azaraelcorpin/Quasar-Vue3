@@ -190,7 +190,7 @@
                                   dense
                                   flat
                                   color="primary"
-                                  @click="showdialog = true; field='Education'; message = (String(faculty.education)||'').split(';')
+                                  @click="showdialog = true; field='education'; message = (String(faculty.education)||'').split(';')
                                             .map(item => item.trim())
                                             .filter(Boolean)
                                             .join(';\n\n')"
@@ -444,11 +444,16 @@ async function handlesFacultyUpdate(_field, _data) {
             backgroundColor: 'white',
             messageColor: 'primary'
           });
+          //change _field value "specializations" to "Specialization" to match the backend field name
+          if(_field === 'specializations')
+            _field = 'specialization';
         let resp = await api.updateFacultyProfile(_field, _data.replace(/\n/g, ' '), faculty.value.id);
         console.log('resp', resp);
         if (resp.statusCode === "200"){
           myDialog.positive($q, "Update Successful", `You have successfully updated your ${_field}.`);
-          if(_field === 'Specialization')
+          console.log('field', _field);
+          console.log('data', _data);
+          if(_field === 'specialization')
             faculty.value.specializations = _data;
           else
             faculty.value[_field] = _data;
